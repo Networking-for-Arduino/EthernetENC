@@ -24,9 +24,9 @@
 
 #include "Enc28J60Network.h"
 #include "Arduino.h"
+#include <SPI.h>
 
 extern "C" {
-#include <avr/io.h>
 #include "enc28j60.h"
 #include "uip.h"
 }
@@ -40,8 +40,6 @@ extern "C" {
 // set CS to 1 = passive
 #define CSPASSIVE digitalWrite(ENC28J60_CONTROL_CS, HIGH)
 //
-#define waitspi() while(!(SPSR&(1<<SPIF)))
-
 uint16_t Enc28J60Network::nextPacketPtr;
 uint8_t Enc28J60Network::bank=0xff;
 
@@ -55,25 +53,9 @@ void Enc28J60Network::init(uint8_t* macaddr)
   pinMode(ENC28J60_CONTROL_CS, OUTPUT);
   CSPASSIVE; // ss=0
   //
-  pinMode(SPI_MOSI, OUTPUT);
-  pinMode(SPI_SCK, OUTPUT);
-  pinMode(SPI_MISO, INPUT);
-  pinMode(SPI_SS, OUTPUT);
+  SPI.begin();
+  SPI.setClockDivider(SPI_CLOCK_DIV2); //results in 8MHZ at 16MHZ system clock.
 
-  digitalWrite(SPI_MOSI, LOW);
-  digitalWrite(SPI_SCK, LOW);
-
-  /*DDRB  |= 1<<PB3 | 1<<PB5; // mosi, sck output
-  cbi(DDRB,PINB4); // MISO is input
-  //
-  cbi(PORTB,PB3); // MOSI low
-  cbi(PORTB,PB5); // SCK low
-  */
-  //
-  // initialize SPI interface
-  // master mode and Fosc/2 clock:
-  SPCR = (1<<SPE)|(1<<MSTR);
-  SPSR |= (1<<SPI2X);
   // perform system reset
   writeOp(ENC28J60_SOFT_RESET, 0, ENC28J60_SOFT_RESET);
   delay(50);
@@ -299,13 +281,11 @@ uint8_t Enc28J60Network::readByte(uint16_t addr)
 
   CSACTIVE;
   // issue read command
-  SPDR = ENC28J60_READ_BUF_MEM;
-  waitspi();
+  SPI.transfer(ENC28J60_READ_BUF_MEM);
   // read data
-  SPDR = 0x00;
-  waitspi();
+  uint8_t c = SPI.transfer(0x00);
   CSPASSIVE;
-  return (SPDR);
+  return c;
 }
 
 void Enc28J60Network::writeByte(uint16_t addr, uint8_t data)
@@ -314,11 +294,9 @@ void Enc28J60Network::writeByte(uint16_t addr, uint8_t data)
 
   CSACTIVE;
   // issue write command
-  SPDR = ENC28J60_WRITE_BUF_MEM;
-  waitspi();
+  SPI.transfer(ENC28J60_WRITE_BUF_MEM);
   // write data
-  SPDR = data;
-  waitspi();
+  SPI.transfer(data);
   CSPASSIVE;
 }
 
@@ -395,20 +373,16 @@ Enc28J60Network::readOp(uint8_t op, uint8_t address)
 {
   CSACTIVE;
   // issue read command
-  SPDR = op | (address & ADDR_MASK);
-  waitspi();
+  SPI.transfer(op | (address & ADDR_MASK));
   // read data
-  SPDR = 0x00;
-  waitspi();
-  // do dummy read if needed (for mac and mii, see datasheet page 29)
   if(address & 0x80)
-  {
-    SPDR = 0x00;
-    waitspi();
-  }
-  // release CS
+    {
+    // do dummy read if needed (for mac and mii, see datasheet page 29)
+    SPI.transfer(0x00);
+    }
+  uint8_t c = SPI.transfer(0x00);
   CSPASSIVE;
-  return(SPDR);
+  return c;
 }
 
 void
@@ -416,11 +390,9 @@ Enc28J60Network::writeOp(uint8_t op, uint8_t address, uint8_t data)
 {
   CSACTIVE;
   // issue write command
-  SPDR = op | (address & ADDR_MASK);
-  waitspi();
+  SPI.transfer(op | (address & ADDR_MASK));
   // write data
-  SPDR = data;
-  waitspi();
+  SPI.transfer(data);
   CSPASSIVE;
 }
 
@@ -429,15 +401,12 @@ Enc28J60Network::readBuffer(uint16_t len, uint8_t* data)
 {
   CSACTIVE;
   // issue read command
-  SPDR = ENC28J60_READ_BUF_MEM;
-  waitspi();
+  SPI.transfer(ENC28J60_READ_BUF_MEM);
   while(len)
   {
     len--;
     // read data
-    SPDR = 0x00;
-    waitspi();
-    *data = SPDR;
+    *data = SPI.transfer(0x00);
     data++;
   }
   //*data='\0';
@@ -449,15 +418,13 @@ Enc28J60Network::writeBuffer(uint16_t len, uint8_t* data)
 {
   CSACTIVE;
   // issue write command
-  SPDR = ENC28J60_WRITE_BUF_MEM;
-  waitspi();
+  SPI.transfer(ENC28J60_WRITE_BUF_MEM);
   while(len)
   {
     len--;
     // write data
-    SPDR = *data;
+    SPI.transfer(*data);
     data++;
-    waitspi();
   }
   CSPASSIVE;
 }
@@ -550,27 +517,20 @@ Enc28J60Network::chksum(uint16_t sum, memhandle handle, memaddress pos, uint16_t
   len = setReadPtr(handle, pos, len)-1;
   CSACTIVE;
   // issue read command
-  SPDR = ENC28J60_READ_BUF_MEM;
-  waitspi();
+  SPI.transfer(ENC28J60_READ_BUF_MEM);
   uint16_t i;
   for (i = 0; i < len; i+=2)
   {
     // read data
-    SPDR = 0x00;
-    waitspi();
-    t = SPDR << 8;
-    SPDR = 0x00;
-    waitspi();
-    t += SPDR;
+    t = SPI.transfer(0x00) << 8;
+    t += SPI.transfer(0x00);
     sum += t;
     if(sum < t) {
       sum++;            /* carry */
     }
   }
   if(i == len) {
-    SPDR = 0x00;
-    waitspi();
-    t = (SPDR << 8) + 0;
+    t = (SPI.transfer(0x00) << 8) + 0;
     sum += t;
     if(sum < t) {
       sum++;            /* carry */
