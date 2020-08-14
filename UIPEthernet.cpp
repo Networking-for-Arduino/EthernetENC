@@ -54,6 +54,11 @@ UIPEthernetClass::UIPEthernetClass()
 {
 }
 
+void UIPEthernetClass::init(uint8_t csPin)
+{
+  Enc28J60Network::setCsPin(csPin);
+}
+
 #if UIP_UDP
 int
 UIPEthernetClass::begin(const uint8_t* mac)

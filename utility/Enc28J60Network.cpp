@@ -36,10 +36,11 @@ extern "C" {
 #endif
 
 // set CS to 0 = active
-#define CSACTIVE digitalWrite(ENC28J60_CONTROL_CS, LOW)
+#define CSACTIVE digitalWrite(csPin, LOW)
 // set CS to 1 = passive
-#define CSPASSIVE digitalWrite(ENC28J60_CONTROL_CS, HIGH)
+#define CSPASSIVE digitalWrite(csPin, HIGH)
 //
+uint8_t Enc28J60Network::csPin=SS;
 uint16_t Enc28J60Network::nextPacketPtr;
 uint8_t Enc28J60Network::bank=0xff;
 
@@ -47,10 +48,11 @@ struct memblock Enc28J60Network::receivePkt;
 
 void Enc28J60Network::init(uint8_t* macaddr)
 {
+
   MemoryPool::init(); // 1 byte in between RX_STOP_INIT and pool to allow prepending of controlbyte
   // initialize I/O
   // ss as output:
-  pinMode(ENC28J60_CONTROL_CS, OUTPUT);
+  pinMode(csPin, OUTPUT);
   CSPASSIVE; // ss=0
   //
   SPI.begin();

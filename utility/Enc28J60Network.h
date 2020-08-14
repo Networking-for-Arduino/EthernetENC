@@ -27,8 +27,6 @@
 
 #include "mempool.h"
 
-#define ENC28J60_CONTROL_CS     SS
-
 #define UIP_RECEIVEBUFFERHANDLE 0xff
 
 //#define ENC28J60DEBUG
@@ -42,6 +40,8 @@ class Enc28J60Network : public MemoryPool
 {
 
 private:
+  static uint8_t csPin;
+
   static uint16_t nextPacketPtr;
   static uint8_t bank;
 
@@ -72,6 +72,7 @@ public:
   void powerOff();
   bool linkStatus();
 
+  static void setCsPin(uint8_t _csPin) {csPin = _csPin;}
   static void init(uint8_t* macaddr);
   static memhandle receivePacket();
   static void freePacket();

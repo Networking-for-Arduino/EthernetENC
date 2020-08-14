@@ -65,6 +65,8 @@ class UIPEthernetClass
 public:
   UIPEthernetClass();
 
+  void init(uint8_t csPin);
+
   int begin(const uint8_t* mac);
   void begin(const uint8_t* mac, IPAddress ip);
   void begin(const uint8_t* mac, IPAddress ip, IPAddress dns);
