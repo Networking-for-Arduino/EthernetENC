@@ -61,10 +61,22 @@
 #define __UIPOPT_H__
 
 #ifndef UIP_LITTLE_ENDIAN
-#define UIP_LITTLE_ENDIAN  3412
+  #if defined(LITTLE_ENDIAN)
+    #define UIP_LITTLE_ENDIAN LITTLE_ENDIAN
+  #elif defined(__ORDER_LITTLE_ENDIAN__)
+    #define UIP_LITTLE_ENDIAN __ORDER_LITTLE_ENDIAN__
+  #else
+    #define UIP_LITTLE_ENDIAN 1234
+  #endif
 #endif /* UIP_LITTLE_ENDIAN */
 #ifndef UIP_BIG_ENDIAN
-#define UIP_BIG_ENDIAN     1234
+  #if defined(BIG_ENDIAN)
+    #define UIP_BIG_ENDIAN BIG_ENDIAN
+  #elif defined(__ORDER_BIG_ENDIAN__)
+    #define UIP_BIG_ENDIAN __ORDER_BIG_ENDIAN__
+  #else
+    #define UIP_BIG_ENDIAN 4321
+  #endif
 #endif /* UIP_BIG_ENDIAN */
 
 #include "uip-conf.h"

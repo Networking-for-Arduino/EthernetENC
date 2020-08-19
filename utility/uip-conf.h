@@ -122,7 +122,7 @@ typedef unsigned short uip_stats_t;
  *
  * \hideinitializer
  */
-#define UIP_CONF_BYTE_ORDER      LITTLE_ENDIAN
+#define UIP_CONF_BYTE_ORDER      __BYTE_ORDER__
 
 /**
  * Logging on or off
