@@ -39,6 +39,8 @@ extern "C" {
 #define CSACTIVE digitalWrite(csPin, LOW)
 // set CS to 1 = passive
 #define CSPASSIVE digitalWrite(csPin, HIGH)
+
+#define SPI_ETHERNET_SETTINGS SPISettings(20000000, MSBFIRST, SPI_MODE0)
 //
 uint8_t Enc28J60Network::csPin=SS;
 uint16_t Enc28J60Network::nextPacketPtr;
@@ -56,7 +58,7 @@ void Enc28J60Network::init(uint8_t* macaddr)
   CSPASSIVE; // ss=0
   //
   SPI.begin();
-  SPI.setClockDivider(SPI_CLOCK_DIV2); //results in 8MHZ at 16MHZ system clock.
+  SPI.beginTransaction(SPI_ETHERNET_SETTINGS);
 
   // perform system reset
   writeOp(ENC28J60_SOFT_RESET, 0, ENC28J60_SOFT_RESET);
@@ -127,6 +129,8 @@ void Enc28J60Network::init(uint8_t* macaddr)
   writeOp(ENC28J60_BIT_FIELD_SET, ECON1, ECON1_RXEN);
   //Configure leds
   phyWrite(PHLCON,0x476);
+
+  SPI.endTransaction();
 }
 
 memhandle
@@ -134,6 +138,9 @@ Enc28J60Network::receivePacket()
 {
   uint8_t rxstat;
   uint16_t len;
+
+  SPI.beginTransaction(SPI_ETHERNET_SETTINGS);
+
   // check if a packet has been received and buffered
   //if( !(readReg(EIR) & EIR_PKTIF) ){
   // The above does not work. See Rev. B4 Silicon Errata point 6.
@@ -175,12 +182,14 @@ Enc28J60Network::receivePacket()
         {
           receivePkt.begin = readPtr;
           receivePkt.size = len;
+          SPI.endTransaction();
           return UIP_RECEIVEBUFFERHANDLE;
         }
       // Move the RX read pointer to the start of the next received packet
       // This frees the memory we just read out
       setERXRDPT();
     }
+  SPI.endTransaction();
   return (NOBLOCK);
 }
 
@@ -202,6 +211,8 @@ Enc28J60Network::sendPacket(memhandle handle)
   memblock *packet = &blocks[handle];
   uint16_t start = packet->begin-1;
   uint16_t end = start + packet->size;
+
+  SPI.beginTransaction(SPI_ETHERNET_SETTINGS);
 
   // backup data at control-byte position
   uint8_t data = readByte(start);
@@ -240,6 +251,8 @@ Enc28J60Network::sendPacket(memhandle handle)
   //restore data on control-byte position
   if (data)
     writeByte(start, data);
+
+  SPI.endTransaction();
 }
 
 uint16_t
@@ -258,8 +271,10 @@ Enc28J60Network::setReadPtr(memhandle handle, memaddress position, uint16_t len)
 uint16_t
 Enc28J60Network::readPacket(memhandle handle, memaddress position, uint8_t* buffer, uint16_t len)
 {
+  SPI.beginTransaction(SPI_ETHERNET_SETTINGS);
   len = setReadPtr(handle, position, len);
   readBuffer(len, buffer);
+  SPI.endTransaction();
   return len;
 }
 
@@ -269,11 +284,15 @@ Enc28J60Network::writePacket(memhandle handle, memaddress position, uint8_t* buf
   memblock *packet = &blocks[handle];
   uint16_t start = packet->begin + position;
 
+  SPI.beginTransaction(SPI_ETHERNET_SETTINGS);
+
   writeRegPair(EWRPTL, start);
 
   if (len > packet->size - position)
     len = packet->size - position;
   writeBuffer(len, buffer);
+
+  SPI.endTransaction();
   return len;
 }
 
@@ -318,6 +337,9 @@ enc28J60_mempool_block_move_callback(memaddress dest, memaddress src, memaddress
 //void
 //Enc28J60Network::memblock_mv_cb(uint16_t dest, uint16_t src, uint16_t len)
 //{
+
+  SPI.beginTransaction(SPI_ETHERNET_SETTINGS);
+
   //as ENC28J60 DMA is unable to copy single bytes:
   if (len == 1)
     {
@@ -362,12 +384,15 @@ enc28J60_mempool_block_move_callback(memaddress dest, memaddress src, memaddress
       // wait until runnig DMA is completed
       while (Enc28J60Network::readOp(ENC28J60_READ_CTRL_REG, ECON1) & ECON1_DMAST);
     }
+  SPI.endTransaction();
 }
 
 void
 Enc28J60Network::freePacket()
 {
+    SPI.beginTransaction(SPI_ETHERNET_SETTINGS);
     setERXRDPT();
+    SPI.endTransaction();
 }
 
 uint8_t
@@ -509,13 +534,17 @@ Enc28J60Network::clkout(uint8_t clk)
 uint8_t
 Enc28J60Network::getrev(void)
 {
-  return(readReg(EREVID));
+  SPI.beginTransaction(SPI_ETHERNET_SETTINGS);
+  uint8_t res = readReg(EREVID);
+  SPI.endTransaction();
+  return res;
 }
 
 uint16_t
 Enc28J60Network::chksum(uint16_t sum, memhandle handle, memaddress pos, uint16_t len)
 {
   uint16_t t;
+  SPI.beginTransaction(SPI_ETHERNET_SETTINGS);
   len = setReadPtr(handle, pos, len)-1;
   CSACTIVE;
   // issue read command
@@ -539,6 +568,7 @@ Enc28J60Network::chksum(uint16_t sum, memhandle handle, memaddress pos, uint16_t
     }
   }
   CSPASSIVE;
+  SPI.endTransaction();
 
   /* Return sum in host byte order. */
   return sum;
@@ -547,26 +577,33 @@ Enc28J60Network::chksum(uint16_t sum, memhandle handle, memaddress pos, uint16_t
 void
 Enc28J60Network::powerOff()
 {
+  SPI.beginTransaction(SPI_ETHERNET_SETTINGS);
   writeOp(ENC28J60_BIT_FIELD_CLR, ECON1, ECON1_RXEN);
   delay(50);
   writeOp(ENC28J60_BIT_FIELD_SET, ECON2, ECON2_VRPS);
   delay(50);
   writeOp(ENC28J60_BIT_FIELD_SET, ECON2, ECON2_PWRSV);
+  SPI.endTransaction();
 }
 
 void
 Enc28J60Network::powerOn()
 {
+  SPI.beginTransaction(SPI_ETHERNET_SETTINGS);
   writeOp(ENC28J60_BIT_FIELD_CLR, ECON2, ECON2_PWRSV);
   delay(50);
   writeOp(ENC28J60_BIT_FIELD_SET, ECON1, ECON1_RXEN);
   delay(50);
+  SPI.endTransaction();
 }
 
 bool
 Enc28J60Network::linkStatus()
 {
-  return (phyRead(PHSTAT2) & 0x0400) > 0;
+  SPI.beginTransaction(SPI_ETHERNET_SETTINGS);
+  bool res = (phyRead(PHSTAT2) & 0x0400) > 0;
+  SPI.endTransaction();
+  return res;
 }
 
 Enc28J60Network Enc28J60;
