@@ -205,7 +205,7 @@ Enc28J60Network::blockSize(memhandle handle)
   return handle == NOBLOCK ? 0 : handle == UIP_RECEIVEBUFFERHANDLE ? receivePkt.size : blocks[handle].size;
 }
 
-void
+bool
 Enc28J60Network::sendPacket(memhandle handle)
 {
   memblock *packet = &blocks[handle];
@@ -237,15 +237,19 @@ Enc28J60Network::sendPacket(memhandle handle)
   writeRegPair(ETXSTL, start);
   // Set the TXND pointer to correspond to the packet size given
   writeRegPair(ETXNDL, end);
+  // Reset the transmit logic problem. See Rev. B7 Silicon Errata issue 12
+  writeOp(ENC28J60_BIT_FIELD_SET, ECON1, ECON1_TXRST);
+  writeOp(ENC28J60_BIT_FIELD_CLR, ECON1, ECON1_TXRST);
+  writeOp(ENC28J60_BIT_FIELD_CLR, EIR, EIR_TXERIF | EIR_TXIF);
   // send the contents of the transmit buffer onto the network
   writeOp(ENC28J60_BIT_FIELD_SET, ECON1, ECON1_TXRTS);
-  // Reset the transmit logic problem. See Rev. B4 Silicon Errata point 12.
-  if( (readReg(EIR) & EIR_TXERIF) )
-    {
-      writeOp(ENC28J60_BIT_FIELD_CLR, ECON1, ECON1_TXRTS);
-    }
+  // wait for transmission to complete or fail
+  uint8_t eir;
+  while (((eir = readReg(EIR)) & (EIR_TXIF | EIR_TXERIF)) == 0);
+  writeOp(ENC28J60_BIT_FIELD_CLR, ECON1, ECON1_TXRTS);
 
   SPI.endTransaction();
+  return (eir & EIR_TXERIF) == 0;
 }
 
 uint16_t
