@@ -231,7 +231,7 @@ ready:
 #endif
       return size-remain;
     }
-  return -1;
+  return 0;
 }
 
 int
