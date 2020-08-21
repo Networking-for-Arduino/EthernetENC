@@ -1,5 +1,5 @@
 /*
- clock-arch.h - Arduino implementation of uIP clock device.
+ clock-arch.c - Arduino implementation of uIP clock device.
  Copyright (c) 2010 Adam Nielsen <malvineous@shikadi.net>
  All rights reserved.
 
@@ -18,18 +18,13 @@
  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-#ifndef clock_h_
-#define clock_h_
+#include <Arduino.h>
+#include "clock-arch.h"
 
-#ifdef __cplusplus
- extern "C" {
-#endif
-
-typedef unsigned long clock_time_t;
-#define CLOCK_CONF_SECOND 1000
-
-#ifdef __cplusplus
+extern "C" {
+clock_time_t
+clock_time(void)
+{
+  return (clock_time_t) millis();
 }
-#endif
-
-#endif
+}
