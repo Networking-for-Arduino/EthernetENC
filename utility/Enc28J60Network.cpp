@@ -237,19 +237,35 @@ Enc28J60Network::sendPacket(memhandle handle)
   writeRegPair(ETXSTL, start);
   // Set the TXND pointer to correspond to the packet size given
   writeRegPair(ETXNDL, end);
-  // Reset the transmit logic problem. See Rev. B7 Silicon Errata issue 12
-  writeOp(ENC28J60_BIT_FIELD_SET, ECON1, ECON1_TXRST);
-  writeOp(ENC28J60_BIT_FIELD_CLR, ECON1, ECON1_TXRST);
-  writeOp(ENC28J60_BIT_FIELD_CLR, EIR, EIR_TXERIF | EIR_TXIF);
-  // send the contents of the transmit buffer onto the network
-  writeOp(ENC28J60_BIT_FIELD_SET, ECON1, ECON1_TXRTS);
-  // wait for transmission to complete or fail
-  uint8_t eir;
-  while (((eir = readReg(EIR)) & (EIR_TXIF | EIR_TXERIF)) == 0);
-  writeOp(ENC28J60_BIT_FIELD_CLR, ECON1, ECON1_TXRTS);
+ 
+  bool success = false;
+  // See Rev. B7 Silicon Errata issues 12 and 13
+  for (uint8_t retry = 0; retry < TX_COLLISION_RETRY_COUNT; retry++)
+    {
+    // Reset the transmit logic problem. Errata 12
+    writeOp(ENC28J60_BIT_FIELD_SET, ECON1, ECON1_TXRST);
+    writeOp(ENC28J60_BIT_FIELD_CLR, ECON1, ECON1_TXRST);
+    writeOp(ENC28J60_BIT_FIELD_CLR, EIR, EIR_TXERIF | EIR_TXIF);
+
+    // send the contents of the transmit buffer onto the network
+    writeOp(ENC28J60_BIT_FIELD_SET, ECON1, ECON1_TXRTS);
+
+    // wait for transmission to complete or fail
+    uint8_t eir;
+    while (((eir = readReg(EIR)) & (EIR_TXIF | EIR_TXERIF)) == 0);
+    writeOp(ENC28J60_BIT_FIELD_CLR, ECON1, ECON1_TXRTS);
+    success = ((eir & EIR_TXERIF) == 0);
+    if (success)
+      break; // usual exit of the for(retry) loop
+
+    // Errata 13 detection
+    uint8_t tsv4 = readByte(end + 4);
+    if (!(tsv4 & 0b00100000)) // is it "late collision" indicated in bit 29 of TSV?
+      break; // other fail, not the Errata 13 situation
+  }
 
   SPI.endTransaction();
-  return (eir & EIR_TXERIF) == 0;
+  return success;
 }
 
 uint16_t
