@@ -209,15 +209,12 @@ void
 Enc28J60Network::sendPacket(memhandle handle)
 {
   memblock *packet = &blocks[handle];
-  uint16_t start = packet->begin-1;
-  uint16_t end = start + packet->size;
+  uint16_t start = packet->begin; // includes the UIP_SENDBUFFER_OFFSET for control byte
+  uint16_t end = start + packet->size - 1 - UIP_SENDBUFFER_PADDING; // end = start + size - 1 and padding for TSV is no included
 
   SPI.beginTransaction(SPI_ETHERNET_SETTINGS);
 
-  // backup data at control-byte position
-  uint8_t data = readByte(start);
   // write control-byte (if not 0 anyway)
-  if (data)
     writeByte(start, 0);
 
 #ifdef ENC28J60DEBUG
@@ -247,10 +244,6 @@ Enc28J60Network::sendPacket(memhandle handle)
     {
       writeOp(ENC28J60_BIT_FIELD_CLR, ECON1, ECON1_TXRTS);
     }
-
-  //restore data on control-byte position
-  if (data)
-    writeByte(start, data);
 
   SPI.endTransaction();
 }

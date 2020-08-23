@@ -295,11 +295,11 @@ boolean UIPEthernetClass::network_send()
       Serial.print(F(", hdrlen: "));
       Serial.println(uip_hdrlen);
 #endif
-      Enc28J60Network::writePacket(uip_packet,0,uip_buf,uip_hdrlen);
+      Enc28J60Network::writePacket(uip_packet, UIP_SENDBUFFER_OFFSET,uip_buf,uip_hdrlen);
       packetstate &= ~ UIPETHERNET_SENDPACKET;
       goto sendandfree;
     }
-  uip_packet = Enc28J60Network::allocBlock(uip_len);
+  uip_packet = Enc28J60Network::allocBlock(uip_len + UIP_SENDBUFFER_OFFSET + UIP_SENDBUFFER_PADDING);
   if (uip_packet != NOBLOCK)
     {
 #ifdef UIPETHERNET_DEBUG
@@ -308,7 +308,7 @@ boolean UIPEthernetClass::network_send()
       Serial.print(F(", packet: "));
       Serial.println(uip_packet);
 #endif
-      Enc28J60Network::writePacket(uip_packet,0,uip_buf,uip_len);
+      Enc28J60Network::writePacket(uip_packet, UIP_SENDBUFFER_OFFSET,uip_buf,uip_len);
       goto sendandfree;
     }
   return false;
@@ -450,7 +450,7 @@ uip_tcpchksum(void)
       sum = Enc28J60Network::chksum(
           sum,
           UIPEthernetClass::uip_packet,
-          UIP_IPH_LEN + UIP_LLH_LEN + upper_layer_memlen,
+          (UIPEthernetClass::packetstate & UIPETHERNET_SENDPACKET ? UIP_IPH_LEN + UIP_LLH_LEN + UIP_SENDBUFFER_OFFSET : UIP_IPH_LEN + UIP_LLH_LEN) + upper_layer_memlen,
           upper_layer_len - upper_layer_memlen
       );
 #ifdef UIPETHERNET_DEBUG_CHKSUM
