@@ -28,6 +28,7 @@ class UIPServer : public Server {
 public:
   UIPServer(uint16_t);
   UIPClient available();
+  UIPClient accept();
   void begin();
   void end();
   operator bool();
