@@ -29,12 +29,16 @@ public:
   UIPServer(uint16_t);
   UIPClient available();
   void begin();
+  void end();
+  operator bool();
+  
   size_t write(uint8_t);
   size_t write(const uint8_t *buf, size_t size);
   using Print::write;
 
 private:
   uint16_t _port;
+  bool listening;
 };
 
 #endif

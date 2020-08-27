@@ -43,6 +43,16 @@ void UIPServer::begin()
 {
   uip_listen(_port);
   UIPEthernetClass::tick();
+  listening = true;
+}
+
+void UIPServer::end() {
+  uip_unlisten(_port);
+  listening = false;
+}
+
+UIPServer::operator bool() {
+  return listening;
 }
 
 size_t UIPServer::write(uint8_t c)
