@@ -136,6 +136,19 @@ int UIPEthernetClass::maintain(){
 #endif
 }
 
+EthernetLinkStatus UIPEthernetClass::linkStatus()
+{
+  if (!Enc28J60.getrev())
+    return Unknown;
+  return Enc28J60.linkStatus() ? LinkON : LinkOFF;
+}
+
+EthernetHardwareStatus UIPEthernetClass::hardwareStatus() {
+  if (!Enc28J60.getrev())
+    return EthernetNoHardware;
+  return EthernetENC28J60;
+}
+
 IPAddress UIPEthernetClass::localIP()
 {
   IPAddress ret;

@@ -549,6 +549,9 @@ Enc28J60Network::getrev(void)
 {
   SPI.beginTransaction(SPI_ETHERNET_SETTINGS);
   uint8_t res = readReg(EREVID);
+  if (res == 0xFF) {
+    res = 0;
+  }
   SPI.endTransaction();
   return res;
 }
