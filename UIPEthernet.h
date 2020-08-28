@@ -81,7 +81,7 @@ public:
 
   void init(uint8_t csPin);
 
-  int begin(const uint8_t* mac);
+  int begin(const uint8_t* mac, unsigned long timeout = 60000, unsigned long responseTimeout = 4000);
   void begin(const uint8_t* mac, IPAddress ip);
   void begin(const uint8_t* mac, IPAddress ip, IPAddress dns);
   void begin(const uint8_t* mac, IPAddress ip, IPAddress dns, IPAddress gateway);
