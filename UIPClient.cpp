@@ -326,6 +326,18 @@ UIPClient::flush()
     }
 }
 
+IPAddress
+UIPClient::remoteIP(void)
+{
+  return data ? ip_addr_uip(uip_conns[data->conn_index].ripaddr) : IPAddress();
+}
+
+uint16_t
+UIPClient::remotePort(void)
+{
+  return data ? ntohs(uip_conns[data->conn_index].rport) : 0;
+}
+
 void
 uipclient_appcall(void)
 {
