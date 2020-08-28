@@ -155,9 +155,10 @@ void DhcpClass::send_DHCP_MESSAGE(uint8_t messageType, uint16_t secondsElapsed)
     buffer[8] = ((secondsElapsed & 0xff00) >> 8);
     buffer[9] = (secondsElapsed & 0x00ff);
 
-    // flags
-    unsigned short flags = htons(DHCP_FLAGSBROADCAST);
-    memcpy(buffer + 10, &(flags), 2);
+    // flags - the only one flag DHCP uses is
+    // to request the server response as broadcast, not unicast
+//    unsigned short flags = htons(DHCP_FLAGSBROADCAST);
+//    memcpy(buffer + 10, &(flags), 2);
 
     // ciaddr: already zeroed
     // yiaddr: already zeroed
