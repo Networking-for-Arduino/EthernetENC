@@ -19,10 +19,9 @@
 #ifndef UIPSERVER_H
 #define UIPSERVER_H
 
-#include "Server.h"
 #include "EthernetClient.h"
 
-class EthernetServer : public Server {
+class EthernetServer {
 
 public:
   EthernetServer(uint16_t);
@@ -32,10 +31,6 @@ public:
   void end();
   operator bool();
   
-  size_t write(uint8_t);
-  size_t write(const uint8_t *buf, size_t size);
-  using Print::write;
-
 private:
   uint16_t _port;
   bool listening;

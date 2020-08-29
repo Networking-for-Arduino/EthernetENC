@@ -72,20 +72,3 @@ void UIPServer::end() {
 UIPServer::operator bool() {
   return listening;
 }
-
-size_t UIPServer::write(uint8_t c)
-{
-  return write(&c,1);
-}
-
-size_t UIPServer::write(const uint8_t *buf, size_t size)
-{
-  size_t ret = 0;
-  for ( uip_userdata_t* data = &UIPClient::all_data[0]; data < &UIPClient::all_data[UIP_CONNS]; data++ )
-    {
-      if ((data->state & UIP_CLIENT_CONNECTED) && uip_conns[data->conn_index].lport ==_port)
-        ret += UIPClient::_write(data,buf,size);
-    }
-  return ret;
-}
-
