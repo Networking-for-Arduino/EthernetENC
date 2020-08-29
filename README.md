@@ -1,11 +1,6 @@
-A further developed version can be found on https://github.com/UIPEthernet/UIPEthernet
-
---------------------------------------------------------------------------------------
-
-This is UIPEthernet version 1.09
 
 An plugin-replacement of the stock Arduino Ethernet library for ENC28J60 shields and breakout boards. Full support for persistent (streaming) TCP-connections and UDP (Client and Server each), ARP, ICMP, DHCP and DNS. 
-Just include 'UIPEthernet.h' instead of 'Ethernet.h' and use all your code written for the stock Arduino Ethernet lib!
+Just include 'EthernetENC.h' instead of 'Ethernet.h' and use all your code written for the stock Arduino Ethernet lib!
 
 UIPEthernet is written as a wrapper around the mature uIP Stack by Adam Dunkels, which provides the low-level implementation for all supported protocols. To overcome the memory-constrains (a 'regular' uIP-application does all processing in RAM) the ENC28J60 internal memory is used for all stream buffers (in and out). Only 400-600 Bytes of Arduinos RAM are used (depending on the number of concurrently open connections). As of Flash-memory a ATmega368-based Arduino is the minimum requirenment.
 
@@ -15,51 +10,12 @@ uIP was written by Adam Dunkels of the Networked Embedded Systems group at the S
 
 This library was inspired by the SerialIP implementation by Adam Nielsen <malvineous@shikadi.net>, actually I took this code as a starting point, but in the latest versions there are very few lines left.
 
-Installation
-------------
+## Documentation
 
-To install the libraries, you need to place them into your "libraries" folder. You can find it within your Arduino IDE distribution within the "hardware" folder.
-
-    C:\> cd [path to Arduino distribution]\libraries
-    C:\> git clone https://github.com/ntruchsess/arduino_uip UIPEthernet
-
-Be sure to restart the IDE if it was running.
-
-On a Mac, you will want to create a folder named "libraries" in in the "Documents" -> "Arduino" folder within your home directory. Clone the project there (and restart the IDE, if it was running during this process).
-
-    $ cd ~/Documents/Arduino/libraries
-    $ git clone https://github.com/ntruchsess/arduino_uip UIPEthernet
+For more information visit Arduino Ethernet library description http://arduino.cc/en/Reference/Ethernet
     
-Or you download the zipped version of the library from https://github.com/ntruchsess/arduino_uip/releases, and copy the contained directory UIPEthernet to [path to Arduino distribution]\libraries\UIPEthernet.
-
-If you are running Arduino-IDE 1.5.x use release-version 1.59 or checkout branch 'Arduino_1.5.x'
-
-Additional information can be found on the Arduino website: http://www.arduino.cc/en/Hacking/Libraries
-
-Documentation
--------------
-
-For more information visit:
-
- - UIPEthernet Repository on github:
-    https://github.com/ntruchsess/arduino_uip
-    
- - Arduino Ethernet library description 
-    http://arduino.cc/en/Reference/Ethernet
-    (Arduino_uip uses the same API as that, just include "UIPEthernet.h", "UIPClient.h", "UIPServer.h" and "UIPUDP.h" instead of the stock "Ethernet.h", "EthernetClient.h", "EthernetServer.h " and "EthernetUDP.h")
-    
- - uIP API reference:
-    http://www.sics.se/~adam/uip/uip-1.0-refman/
-
- - Arduino forums
-    http://www.arduino.cc/cgi-bin/yabb2/YaBB.pl
-
- - uIP homepage:
-    http://www.sics.se/~adam/uip/index.php/Main_Page
-
-Licenses
--------------
-
+## Licenses
+```
 UIPEthernet.h
 UIPEthernet.cpp
 UIPServer.h
@@ -229,3 +185,4 @@ Lesser General Public License for more details.
 You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+```
