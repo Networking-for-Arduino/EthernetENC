@@ -20,7 +20,6 @@
 #ifndef UIPUDP_H
 #define UIPUDP_H
 
-#include "ethernet_comp.h"
 #include "Arduino.h"
 #include <Udp.h>
 #include "utility/mempool.h"
@@ -40,7 +39,7 @@ typedef struct {
   boolean send;
 } uip_udp_userdata_t;
 
-class UIPUDP : public UDP
+class EthernetUDP : public UDP
 {
 
 private:
@@ -49,7 +48,7 @@ private:
   uip_udp_userdata_t appdata;
 
 public:
-  UIPUDP();  // Constructor
+  EthernetUDP();  // Constructor
   uint8_t
   begin(uint16_t);// initialize, start listening on specified port. Returns 1 if successful, 0 if there are no sockets available to use
   void

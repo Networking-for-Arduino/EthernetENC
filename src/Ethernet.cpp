@@ -18,14 +18,14 @@
   */
 
 #include <Arduino.h>
-#include "UIPEthernet.h"
+#include "Ethernet.h"
 #include "utility/Enc28J60Network.h"
 
 #if(defined UIPETHERNET_DEBUG || defined UIPETHERNET_DEBUG_CHKSUM)
 #include "HardwareSerial.h"
 #endif
 
-#include "UIPUdp.h"
+#include "EthernetUdp.h"
 
 extern "C"
 {
@@ -291,7 +291,7 @@ UIPEthernetClass::tick()
           // uip_len is set to a value > 0. */
           if (uip_len > 0)
             {
-              UIPUDP::_send((uip_udp_userdata_t *)(uip_udp_conns[i].appstate));
+              EthernetUDP::_send((uip_udp_userdata_t *)(uip_udp_conns[i].appstate));
             }
         }
 #endif /* UIP_UDP */
@@ -357,7 +357,8 @@ void UIPEthernetClass::configure(IPAddress ip, IPAddress dns, IPAddress gateway,
   _dnsServerAddress = dns;
 }
 
-UIPEthernetClass UIPEthernet;
+UIPEthernetClass Ethernet;
+#define UIPEthernet Ethernet
 
 /*---------------------------------------------------------------------------*/
 uint16_t

@@ -17,8 +17,8 @@
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "UIPEthernet.h"
-#include "UIPUdp.h"
+#include "Ethernet.h"
+#include "EthernetUdp.h"
 #include "Dns.h"
 
 #ifdef UIPETHERNET_DEBUG_UDP
@@ -34,6 +34,8 @@ extern "C" {
 #if UIP_UDP
 #define UIP_ARPHDRSIZE 42
 #define UDPBUF ((struct uip_udpip_hdr *)&uip_buf[UIP_LLH_LEN])
+
+#define UIPUDP EthernetUDP // to not pollute source code history with the rename
 
 // Constructor
 UIPUDP::UIPUDP() :
@@ -151,7 +153,7 @@ UIPUDP::beginPacket(const char *host, uint16_t port)
   DNSClient dns;
   IPAddress remote_addr;
 
-  dns.begin(UIPEthernet.dnsServerIP());
+  dns.begin(Ethernet.dnsServerIP());
   ret = dns.getHostByName(host, remote_addr);
   if (ret == 1) {
     return beginPacket(remote_addr, port);

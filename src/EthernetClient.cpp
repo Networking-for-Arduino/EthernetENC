@@ -24,8 +24,8 @@ extern "C"
 #include "utility/uip_arp.h"
 #include "string.h"
 }
-#include "UIPEthernet.h"
-#include "UIPClient.h"
+#include "Ethernet.h"
+#include "EthernetClient.h"
 #include "Dns.h"
 
 #ifdef UIPETHERNET_DEBUG_CLIENT
@@ -33,6 +33,8 @@ extern "C"
 #endif
 
 #define UIP_TCP_PHYH_LEN UIP_LLH_LEN+UIP_IPTCPH_LEN
+
+#define UIPClient EthernetClient // to not pollute source code history with the rename
 
 uip_userdata_t UIPClient::all_data[UIP_CONNS];
 

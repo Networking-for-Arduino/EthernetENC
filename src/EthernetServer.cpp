@@ -16,11 +16,14 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
   */
-#include "UIPEthernet.h"
-#include "UIPServer.h"
+#include "Ethernet.h"
+#include "EthernetServer.h"
 extern "C" {
   #include "utility/uip-conf.h"
 }
+
+#define UIPServer EthernetServer // to not pollute source code history with the rename
+#define UIPClient EthernetClient
 
 UIPServer::UIPServer(uint16_t port) : _port(htons(port))
 {

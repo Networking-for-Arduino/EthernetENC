@@ -4,7 +4,7 @@
 #ifndef Dhcp_h
 #define Dhcp_h
 
-#include "UIPUdp.h"
+#include "EthernetUdp.h"
 
 /* DHCP state machine. */
 #define STATE_DHCP_START 0
@@ -155,7 +155,7 @@ private:
   unsigned long _responseTimeout;
   unsigned long _secTimeout;
   uint8_t _dhcp_state;
-  UIPUDP _dhcpUdpSocket;
+  EthernetUDP _dhcpUdpSocket;
   
   int request_DHCP_lease();
   void reset_DHCP_lease();

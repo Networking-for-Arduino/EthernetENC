@@ -20,7 +20,6 @@
 #ifndef UIPCLIENT_H
 #define UIPCLIENT_H
 
-#include "ethernet_comp.h"
 #include "Print.h"
 #include "Client.h"
 #include "utility/mempool.h"
@@ -60,10 +59,10 @@ typedef struct {
 #endif
 } uip_userdata_t;
 
-class UIPClient : public Client {
+class EthernetClient : public Client {
 
 public:
-  UIPClient();
+  EthernetClient();
   int connect(IPAddress ip, uint16_t port);
   int connect(const char *host, uint16_t port);
   int read(uint8_t *buf, size_t size);
@@ -86,8 +85,8 @@ public:
   uint16_t remotePort();
 
 private:
-  UIPClient(struct uip_conn *_conn);
-  UIPClient(uip_userdata_t* conn_data);
+  EthernetClient(struct uip_conn *_conn);
+  EthernetClient(uip_userdata_t* conn_data);
 
   uip_userdata_t* data;
 
@@ -106,7 +105,7 @@ private:
 #endif
 
   friend class UIPEthernetClass;
-  friend class UIPServer;
+  friend class EthernetServer;
 
   friend void uipclient_appcall(void);
 

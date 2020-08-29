@@ -25,14 +25,13 @@
 //#define UIPETHERNET_DEBUG_UDP
 //#define UIPETHERNET_DEBUG_CLIENT
 
-#include "ethernet_comp.h"
 #include <Arduino.h>
 #include "Dhcp.h"
 #include "IPAddress.h"
 #include "utility/Enc28J60Network.h"
-#include "UIPClient.h"
-#include "UIPServer.h"
-#include "UIPUdp.h"
+#include "EthernetClient.h"
+#include "EthernetServer.h"
+#include "EthernetUdp.h"
 
 extern "C"
 {
@@ -118,11 +117,11 @@ private:
 
   static boolean network_send();
 
-  friend class UIPServer;
+  friend class EthernetServer;
 
-  friend class UIPClient;
+  friend class EthernetClient;
 
-  friend class UIPUDP;
+  friend class EthernetUDP;
 
   static uint16_t chksum(uint16_t sum, const uint8_t* data, uint16_t len);
   static uint16_t ipchksum(void);
@@ -141,6 +140,6 @@ private:
 #endif /* UIP_CONF_IPV6 */
 };
 
-extern UIPEthernetClass UIPEthernet;
+extern UIPEthernetClass Ethernet;
 
 #endif

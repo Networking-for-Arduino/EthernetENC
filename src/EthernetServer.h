@@ -19,16 +19,15 @@
 #ifndef UIPSERVER_H
 #define UIPSERVER_H
 
-#include "ethernet_comp.h"
 #include "Server.h"
-#include "UIPClient.h"
+#include "EthernetClient.h"
 
-class UIPServer : public Server {
+class EthernetServer : public Server {
 
 public:
-  UIPServer(uint16_t);
-  UIPClient available();
-  UIPClient accept();
+  EthernetServer(uint16_t);
+  EthernetClient available();
+  EthernetClient accept();
   void begin();
   void end();
   operator bool();

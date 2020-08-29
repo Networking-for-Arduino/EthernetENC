@@ -5,7 +5,7 @@
 #ifndef DNSClient_h
 #define DNSClient_h
 
-#include <UIPUdp.h>
+#include "EthernetUdp.h"
 
 class DNSClient
 {
@@ -35,7 +35,7 @@ protected:
 
     IPAddress iDNSServer;
     uint16_t iRequestId;
-    UIPUDP iUdp;
+    EthernetUDP iUdp;
 };
 
 #endif
