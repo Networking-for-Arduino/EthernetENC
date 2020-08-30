@@ -35,7 +35,6 @@
 
 extern "C"
 {
-#include "utility/uip_timer.h"
 #include "utility/uip.h"
 }
 

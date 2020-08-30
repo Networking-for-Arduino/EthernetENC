@@ -32,7 +32,6 @@ extern "C"
 #include "utility/uip-conf.h"
 #include "utility/uip.h"
 #include "utility/uip_arp.h"
-#include "utility/uip_timer.h"
 }
 
 #define ETH_HDR ((struct uip_eth_hdr *)&uip_buf[0])
