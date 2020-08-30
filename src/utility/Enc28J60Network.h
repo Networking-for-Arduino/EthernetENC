@@ -72,10 +72,10 @@ private:
 
 public:
 
-  uint8_t getrev(void);
-  void powerOn();
-  void powerOff();
-  bool linkStatus();
+  static uint8_t getrev(void);
+  static void powerOn();
+  static void powerOff();
+  static bool linkStatus();
 
   static void setCsPin(uint8_t _csPin) {csPin = _csPin;}
   static void init(uint8_t* macaddr);
@@ -89,5 +89,4 @@ public:
   static uint16_t chksum(uint16_t sum, memhandle handle, memaddress pos, uint16_t len);
 };
 
-extern Enc28J60Network Enc28J60;
 #endif /* Enc28J60NetworkClass_H_ */

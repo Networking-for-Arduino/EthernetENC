@@ -616,5 +616,3 @@ Enc28J60Network::linkStatus()
   SPI.endTransaction();
   return res;
 }
-
-Enc28J60Network Enc28J60;
