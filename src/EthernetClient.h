@@ -39,6 +39,7 @@ extern "C" {
 #define UIP_CLIENT_REMOTECLOSED 0x04
 #define UIP_CLIENT_RESTART 0x08
 #define UIP_CLIENT_ACCEPTED 0x10
+#define UIP_CLIENT_FLUSH 0x20
 
 typedef uint8_t uip_socket_ptr;
 

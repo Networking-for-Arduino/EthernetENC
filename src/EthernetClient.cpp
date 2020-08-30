@@ -239,14 +239,22 @@ ready:
 void
 UIPClient::flush()
 {
+  if (data && data->packets_out[0] != NOBLOCK)
+    data->state |= UIP_CLIENT_FLUSH;
 }
 
 int
 UIPClient::available()
 {
-  if (*this)
-    return _available(data);
-  return 0;
+  if (!(*this))
+    return 0;
+
+  int len = _available(data);
+
+  // if sketch checks for incoming data and there are unsent data, flush the transmit buffer
+  if (!len)
+    flush();
+  return len;
 }
 
 int
@@ -267,7 +275,10 @@ UIPClient::read(uint8_t *buf, size_t size)
     {
       uint16_t remain = size;
       if (data->packets_in[0] == NOBLOCK)
+        {
+        flush();  // if sketch checks for incoming data and there are unsent data, flush the transmit buffer
         return 0;
+        }
       uint16_t read;
       do
         {
@@ -434,6 +445,8 @@ finish_newdata:
           Serial.println(F("UIPClient uip_acked"));
 #endif
           UIPClient::_eatBlock(&u->packets_out[0]);
+          if (u->packets_out[0] == NOBLOCK)
+            u->state &= ~UIP_CLIENT_FLUSH;
         }
       if (uip_poll() || uip_rexmit())
         {
@@ -444,11 +457,13 @@ finish_newdata:
             {
               if (u->packets_out[1] == NOBLOCK)
                 {
+                 if ((u->state & UIP_CLIENT_FLUSH) || (u->state & UIP_CLIENT_CLOSE)) {
                   send_len = u->out_pos;
                   if (send_len > 0)
                     {
                       Enc28J60Network::resizeBlock(u->packets_out[0],0,send_len);
                     }
+                 }
                 }
               else
                 send_len = Enc28J60Network::blockSize(u->packets_out[0]);
