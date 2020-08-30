@@ -23,17 +23,13 @@
  */
 
 #include "Enc28J60Network.h"
-#include "Arduino.h"
+#include <Arduino.h>
 #include <SPI.h>
 
 extern "C" {
 #include "enc28j60.h"
 #include "uip.h"
 }
-
-#ifdef ENC28J60DEBUG
-#include "HardwareSerial.h"
-#endif
 
 // set CS to 0 = active
 #define CSACTIVE digitalWrite(csPin, LOW)

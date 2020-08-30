@@ -20,8 +20,7 @@
 #ifndef UIPCLIENT_H
 #define UIPCLIENT_H
 
-#include "Print.h"
-#include "Client.h"
+#include <Client.h>
 #include "utility/mempool.h"
 
 extern "C" {
@@ -29,10 +28,6 @@ extern "C" {
 }
 
 #define UIP_SOCKET_DATALEN UIP_TCP_MSS
-//#define UIP_SOCKET_NUMPACKETS UIP_RECEIVE_WINDOW/UIP_TCP_MSS+1
-#ifndef UIP_SOCKET_NUMPACKETS
-#define UIP_SOCKET_NUMPACKETS 5
-#endif
 
 #define UIP_CLIENT_CONNECTED 0x01
 #define UIP_CLIENT_CLOSE 0x02
@@ -40,8 +35,6 @@ extern "C" {
 #define UIP_CLIENT_RESTART 0x08
 #define UIP_CLIENT_ACCEPTED 0x10
 #define UIP_CLIENT_FLUSH 0x20
-
-typedef uint8_t uip_socket_ptr;
 
 typedef struct {
   uint8_t conn_index;

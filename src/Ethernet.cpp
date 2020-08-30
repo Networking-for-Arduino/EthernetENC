@@ -21,12 +21,6 @@
 #include "Ethernet.h"
 #include "utility/Enc28J60Network.h"
 
-#if(defined UIPETHERNET_DEBUG || defined UIPETHERNET_DEBUG_CHKSUM)
-#include "HardwareSerial.h"
-#endif
-
-#include "EthernetUdp.h"
-
 extern "C"
 {
 #include "utility/uip-conf.h"
@@ -131,8 +125,8 @@ int UIPEthernetClass::maintain(){
         break;
     }
   }
-  return rc;
 #endif
+  return rc;
 }
 
 EthernetLinkStatus UIPEthernetClass::linkStatus()

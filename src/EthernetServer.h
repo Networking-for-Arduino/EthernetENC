@@ -33,7 +33,7 @@ public:
   
 private:
   uint16_t _port;
-  bool listening;
+  bool listening = false;
 };
 
 #endif

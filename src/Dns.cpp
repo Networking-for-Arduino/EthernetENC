@@ -2,13 +2,8 @@
 // (c) Copyright 2009-2010 MCQN Ltd.
 // Released under Apache License, version 2.0
 
-#include "Udp.h"
-
 #include "Dns.h"
-#include <string.h>
-//#include <stdlib.h>
-#include "Arduino.h"
-
+#include <Arduino.h>
 
 #define SOCKET_NONE	255
 // Various flags and header field values for a DNS message

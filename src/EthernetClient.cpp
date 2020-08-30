@@ -22,15 +22,10 @@ extern "C"
 #include "utility/uip-conf.h"
 #include "utility/uip.h"
 #include "utility/uip_arp.h"
-#include "string.h"
 }
 #include "Ethernet.h"
 #include "EthernetClient.h"
 #include "Dns.h"
-
-#ifdef UIPETHERNET_DEBUG_CLIENT
-#include "HardwareSerial.h"
-#endif
 
 #define UIP_TCP_PHYH_LEN UIP_LLH_LEN+UIP_IPTCPH_LEN
 
@@ -113,7 +108,7 @@ UIPClient::stop()
       Serial.println(F("before stop(), with data"));
       _dumpAllData();
 #endif
-      _flushBlocks(&data->packets_in[0]);
+      _flushBlocks(data->packets_in);
       if (data->state & UIP_CLIENT_REMOTECLOSED)
         {
           data->state = 0;
@@ -179,7 +174,7 @@ UIPClient::_write(uip_userdata_t* u, const uint8_t *buf, size_t size)
   UIPEthernetClass::tick();
   if (u && !(u->state & (UIP_CLIENT_CLOSE | UIP_CLIENT_REMOTECLOSED)))
     {
-      uint8_t p = _currentBlock(&u->packets_out[0]);
+      uint8_t p = _currentBlock(u->packets_out);
       if (u->packets_out[p] == NOBLOCK)
         {
 newpacket:
@@ -286,7 +281,7 @@ UIPClient::read(uint8_t *buf, size_t size)
           if (read == Enc28J60Network::blockSize(data->packets_in[0]))
             {
               remain -= read;
-              _eatBlock(&data->packets_in[0]);
+              _eatBlock(data->packets_in);
               if (uip_stopped(&uip_conns[data->conn_index]) && !(data->state & (UIP_CLIENT_CLOSE | UIP_CLIENT_REMOTECLOSED)))
                 data->state |= UIP_CLIENT_RESTART;
               if (data->packets_in[0] == NOBLOCK)
@@ -340,7 +335,7 @@ UIPClient::discardReceived()
 {
   if (*this)
     {
-      _flushBlocks(&data->packets_in[0]);
+      _flushBlocks(data->packets_in);
     }
 }
 
@@ -423,7 +418,7 @@ finish_newdata:
           UIPClient::_dumpAllData();
 #endif
           // drop outgoing packets not sent yet:
-          UIPClient::_flushBlocks(&u->packets_out[0]);
+          UIPClient::_flushBlocks(u->packets_out);
           if (u->packets_in[0] != NOBLOCK)
             {
               ((uip_userdata_closed_t *)u)->lport = uip_conn->lport;
@@ -444,7 +439,7 @@ finish_newdata:
 #ifdef UIPETHERNET_DEBUG_CLIENT
           Serial.println(F("UIPClient uip_acked"));
 #endif
-          UIPClient::_eatBlock(&u->packets_out[0]);
+          UIPClient::_eatBlock(u->packets_out);
           if (u->packets_out[0] == NOBLOCK)
             u->state &= ~UIP_CLIENT_FLUSH;
         }

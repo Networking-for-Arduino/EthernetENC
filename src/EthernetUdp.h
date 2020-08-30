@@ -20,7 +20,7 @@
 #ifndef UIPUDP_H
 #define UIPUDP_H
 
-#include "Arduino.h"
+#include <Arduino.h>
 #include <Udp.h>
 #include "utility/mempool.h"
 extern "C" {

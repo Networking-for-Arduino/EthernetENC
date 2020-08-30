@@ -21,10 +21,6 @@
 #include "EthernetUdp.h"
 #include "Dns.h"
 
-#ifdef UIPETHERNET_DEBUG_UDP
-#include "HardwareSerial.h"
-#endif
-
 extern "C" {
 #include "utility/uip-conf.h"
 #include "utility/uip.h"
