@@ -286,7 +286,7 @@ uint16_t DNSClient::ProcessResponse(uint16_t aTimeout, IPAddress& aAddress)
         ((header_flags & QUERY_RESPONSE_MASK) != (uint16_t)RESPONSE_FLAG) )
     {
         // Mark the entire packet as read
-        iUdp.flush();
+        iUdp.discardReceived();
         return INVALID_RESPONSE;
     }
     // Check for any errors in the response (or in our request)
@@ -294,7 +294,7 @@ uint16_t DNSClient::ProcessResponse(uint16_t aTimeout, IPAddress& aAddress)
     if ( (header_flags & TRUNCATION_FLAG) || (header_flags & RESP_MASK) )
     {
         // Mark the entire packet as read
-        iUdp.flush();
+        iUdp.discardReceived();
         return -5; //INVALID_RESPONSE;
     }
 
@@ -303,7 +303,7 @@ uint16_t DNSClient::ProcessResponse(uint16_t aTimeout, IPAddress& aAddress)
     if (answerCount == 0 )
     {
         // Mark the entire packet as read
-        iUdp.flush();
+        iUdp.discardReceived();
         return -6; //INVALID_RESPONSE;
     }
 
@@ -396,7 +396,7 @@ uint16_t DNSClient::ProcessResponse(uint16_t aTimeout, IPAddress& aAddress)
             {
                 // It's a weird size
                 // Mark the entire packet as read
-                iUdp.flush();
+                iUdp.discardReceived();
                 return -9;//INVALID_RESPONSE;
             }
             iUdp.read(aAddress.raw_address(), 4);
@@ -413,7 +413,7 @@ uint16_t DNSClient::ProcessResponse(uint16_t aTimeout, IPAddress& aAddress)
     }
 
     // Mark the entire packet as read
-    iUdp.flush();
+    iUdp.discardReceived();
 
     // If we get here then we haven't found an answer
     return -10;//INVALID_RESPONSE;

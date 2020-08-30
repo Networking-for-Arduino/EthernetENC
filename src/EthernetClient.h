@@ -74,10 +74,12 @@ public:
 
   size_t write(uint8_t);
   size_t write(const uint8_t *buf, size_t size);
+  void flush(); // flush sends the buffered data
+
   int available();
   int read();
   int peek();
-  void flush();
+  void discardReceived();
 
   using Print::write;
 

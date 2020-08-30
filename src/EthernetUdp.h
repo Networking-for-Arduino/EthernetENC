@@ -74,6 +74,9 @@ public:
   // Write size bytes from buffer into the packet
   size_t
   write(const uint8_t *buffer, size_t size);
+  // flush() should send the data, but here endPacket does it
+  void
+  flush() {}; // in Print it is empty, UDP makes it pure virtual
 
   using Print::write;
 
@@ -103,7 +106,7 @@ public:
   int
   peek();
   void
-  flush();	// Finish reading the current packet
+  discardReceived(); // former flush
 
   // Return the IP address of the host who sent the current incoming packet
   IPAddress

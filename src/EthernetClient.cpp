@@ -236,6 +236,11 @@ ready:
   return 0;
 }
 
+void
+UIPClient::flush()
+{
+}
+
 int
 UIPClient::available()
 {
@@ -320,7 +325,7 @@ UIPClient::peek()
 }
 
 void
-UIPClient::flush()
+UIPClient::discardReceived()
 {
   if (*this)
     {

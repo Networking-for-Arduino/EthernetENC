@@ -294,7 +294,7 @@ UIPUDP::peek()
 
 // Finish reading the current packet
 void
-UIPUDP::flush()
+UIPUDP::discardReceived()
 {
   UIPEthernetClass::tick();
   Enc28J60Network::freeBlock(appdata.packet_in);

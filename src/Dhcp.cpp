@@ -274,7 +274,7 @@ uint8_t DhcpClass::parseDHCPResponse(unsigned long responseTimeout, uint32_t& tr
         if(memcmp(fixedMsg.chaddr, _dhcpMacAddr, 6) != 0 || (transactionId < _dhcpInitialTransactionId) || (transactionId > _dhcpTransactionId))
         {
             // Need to read the rest of the packet here regardless
-            _dhcpUdpSocket.flush();
+            _dhcpUdpSocket.discardReceived();
             return 0;
         }
 
@@ -375,7 +375,7 @@ uint8_t DhcpClass::parseDHCPResponse(unsigned long responseTimeout, uint32_t& tr
     }
 
     // Need to skip to end of the packet regardless here
-    _dhcpUdpSocket.flush();
+    _dhcpUdpSocket.discardReceived();
 
     return type;
 }
