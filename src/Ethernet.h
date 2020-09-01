@@ -99,6 +99,7 @@ public:
   IPAddress dnsServerIP();
 
 private:
+  static bool initialized;
   static memhandle in_packet;
   static memhandle uip_packet;
   static uint8_t uip_hdrlen;

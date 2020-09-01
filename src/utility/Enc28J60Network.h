@@ -78,7 +78,7 @@ public:
   static bool linkStatus();
 
   static void setCsPin(uint8_t _csPin) {csPin = _csPin;}
-  static void init(uint8_t* macaddr);
+  static bool init(uint8_t* macaddr);
   static memhandle receivePacket();
   static void freePacket();
   static memaddress blockSize(memhandle handle);

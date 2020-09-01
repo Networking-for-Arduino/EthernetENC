@@ -44,7 +44,7 @@ uint8_t Enc28J60Network::bank=0xff;
 
 struct memblock Enc28J60Network::receivePkt;
 
-void Enc28J60Network::init(uint8_t* macaddr)
+bool Enc28J60Network::init(uint8_t* macaddr)
 {
 
   MemoryPool::init(); // 1 byte in between RX_STOP_INIT and pool to allow prepending of controlbyte
@@ -126,6 +126,8 @@ void Enc28J60Network::init(uint8_t* macaddr)
   phyWrite(PHLCON,0x476);
 
   SPI.endTransaction();
+
+  return getrev();
 }
 
 memhandle

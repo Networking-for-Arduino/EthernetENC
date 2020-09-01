@@ -30,6 +30,7 @@ extern "C"
 
 #define ETH_HDR ((struct uip_eth_hdr *)&uip_buf[0])
 
+bool UIPEthernetClass::initialized = false;
 memhandle UIPEthernetClass::in_packet(NOBLOCK);
 memhandle UIPEthernetClass::uip_packet(NOBLOCK);
 uint8_t UIPEthernetClass::uip_hdrlen(0);
@@ -131,13 +132,14 @@ int UIPEthernetClass::maintain(){
 
 EthernetLinkStatus UIPEthernetClass::linkStatus()
 {
-  if (!Enc28J60Network::getrev())
+  if (!(initialized && Enc28J60Network::getrev()))
     return Unknown;
   return Enc28J60Network::linkStatus() ? LinkON : LinkOFF;
 }
 
-EthernetHardwareStatus UIPEthernetClass::hardwareStatus() {
-  if (!Enc28J60Network::getrev())
+EthernetHardwareStatus UIPEthernetClass::hardwareStatus()
+{
+  if (!(initialized && Enc28J60Network::getrev()))
     return EthernetNoHardware;
   return EthernetENC28J60;
 }
@@ -174,6 +176,8 @@ IPAddress UIPEthernetClass::dnsServerIP()
 void
 UIPEthernetClass::tick()
 {
+  if (!initialized)
+    return;
   if (in_packet == NOBLOCK)
     {
       in_packet = Enc28J60Network::receivePacket();
@@ -331,7 +335,7 @@ sendandfree:
 void UIPEthernetClass::init(const uint8_t* mac) {
   periodic_timer = millis() + UIP_PERIODIC_TIMER;
 
-  Enc28J60Network::init((uint8_t*)mac);
+  initialized = Enc28J60Network::init((uint8_t*)mac);
   uip_seteth_addr(mac);
 
   uip_init();
@@ -352,9 +356,6 @@ void UIPEthernetClass::configure(IPAddress ip, IPAddress dns, IPAddress gateway,
 
   _dnsServerAddress = dns;
 }
-
-UIPEthernetClass Ethernet;
-#define UIPEthernet Ethernet
 
 /*---------------------------------------------------------------------------*/
 uint16_t
@@ -480,21 +481,23 @@ uip_tcpchksum(void)
 uint16_t
 uip_ipchksum(void)
 {
-  return UIPEthernet.ipchksum();
+  return UIPEthernetClass::ipchksum();
 }
 
 #if UIP_UDP
 uint16_t
 uip_tcpchksum(void)
 {
-  uint16_t sum = UIPEthernet.upper_layer_chksum(UIP_PROTO_TCP);
+  uint16_t sum = UIPEthernetClass::upper_layer_chksum(UIP_PROTO_TCP);
   return sum;
 }
 
 uint16_t
 uip_udpchksum(void)
 {
-  uint16_t sum = UIPEthernet.upper_layer_chksum(UIP_PROTO_UDP);
+  uint16_t sum = UIPEthernetClass::upper_layer_chksum(UIP_PROTO_UDP);
   return sum;
 }
 #endif
+
+UIPEthernetClass Ethernet;
