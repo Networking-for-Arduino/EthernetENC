@@ -3,19 +3,16 @@
 
 /* for TCP */
 #ifndef UIP_SOCKET_NUMPACKETS
-#define UIP_SOCKET_NUMPACKETS    5
+#define UIP_SOCKET_NUMPACKETS    3
 #endif
 #ifndef UIP_CONF_MAX_CONNECTIONS
 #define UIP_CONF_MAX_CONNECTIONS 4
 #endif
 
 /* for UDP
- * set UIP_CONF_UDP to 0 to disable UDP (saves aprox. 5kb flash) */
+ * set UIP_CONF_UDP to 0 to disable UDP (saves aprox. 4kB flash) */
 #ifndef UIP_CONF_UDP
 #define UIP_CONF_UDP             1
-#endif
-#ifndef UIP_CONF_BROADCAST
-#define UIP_CONF_BROADCAST       1
 #endif
 #ifndef UIP_CONF_UDP_CONNS
 #define UIP_CONF_UDP_CONNS       4
@@ -30,12 +27,12 @@
 /* timeout after which UIPClient::connect gives up. The timeout is specified in seconds.
  * if set to a number <= 0 connect will timeout when uIP does (which might be longer than you expect...) */
 #ifndef UIP_CONNECT_TIMEOUT
-#define UIP_CONNECT_TIMEOUT      -1
+#define UIP_CONNECT_TIMEOUT      5
 #endif
 
 /* periodic timer for uip (in ms) */
 #ifndef UIP_PERIODIC_TIMER
-#define UIP_PERIODIC_TIMER       250
+#define UIP_PERIODIC_TIMER       100
 #endif
 
 /* timer to poll client for data after last write (in ms)

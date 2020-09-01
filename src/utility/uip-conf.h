@@ -152,8 +152,8 @@ typedef unsigned short uip_stats_t;
  * UDP Broadcast (receive) on or off
  * (see uipethernet-conf.h)
  * \hideinitializer
- * #define UIP_CONF_BROADCAST    1
  */
+#define UIP_CONF_BROADCAST    1
 
 
 /**
