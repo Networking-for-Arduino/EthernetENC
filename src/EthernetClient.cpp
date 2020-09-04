@@ -223,9 +223,6 @@ newpacket:
           goto newpacket;
         }
 ready:
-#if UIP_CLIENT_TIMER >= 0
-      u->timer = millis()+UIP_CLIENT_TIMER;
-#endif
       return size-remain;
     }
   return 0;
@@ -442,12 +439,14 @@ finish_newdata:
           UIPClient::_eatBlock(u->packets_out);
           if (u->packets_out[0] == NOBLOCK)
             u->state &= ~UIP_CLIENT_FLUSH;
+          goto send;
         }
       if (uip_poll() || uip_rexmit())
         {
 #ifdef UIPETHERNET_DEBUG_CLIENT
           //Serial.println(F("UIPClient uip_poll"));
 #endif
+send:
           if (u->packets_out[0] != NOBLOCK)
             {
               if (u->packets_out[1] == NOBLOCK)
