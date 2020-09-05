@@ -172,7 +172,7 @@ UIPClient::_write(uip_userdata_t* u, const uint8_t *buf, size_t size)
 #endif
   repeat:
   UIPEthernetClass::tick();
-  if (u && !(u->state & (UIP_CLIENT_CLOSE | UIP_CLIENT_REMOTECLOSED)))
+  if (u && u->state && !(u->state & (UIP_CLIENT_CLOSE | UIP_CLIENT_REMOTECLOSED)))
     {
       uint8_t p = _currentBlock(u->packets_out);
       if (u->packets_out[p] == NOBLOCK)
@@ -420,7 +420,7 @@ finish_newdata:
           uip_restart();
         }
       // If the connection has been closed, save received but unread data.
-      if (uip_closed() || uip_timedout())
+      if (uip_closed() || uip_timedout() || uip_aborted())
         {
 #ifdef UIPETHERNET_DEBUG_CLIENT
           Serial.println(F("UIPClient uip_closed"));
