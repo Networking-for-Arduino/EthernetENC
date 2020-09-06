@@ -153,22 +153,17 @@ UIPClient::operator bool()
 size_t
 UIPClient::write(uint8_t c)
 {
-  return _write(data, &c, 1);
+  return write(&c, 1);
 }
 
 size_t
 UIPClient::write(const uint8_t *buf, size_t size)
 {
-  return _write(data, buf, size);
-}
-
-size_t
-UIPClient::_write(uip_userdata_t* u, const uint8_t *buf, size_t size)
-{
+  uip_userdata_t* u = data;
   int remain = size;
   uint16_t written;
-#if UIP_ATTEMPTS_ON_WRITE > 0
-  uint16_t attempts = UIP_ATTEMPTS_ON_WRITE;
+#if UIP_WRITE_TIMEOUT > 0
+  uint32_t timeout_start = millis();
 #endif
   repeat:
   UIPEthernetClass::tick();
@@ -181,13 +176,14 @@ newpacket:
           u->packets_out[p] = Enc28J60Network::allocBlock(UIP_SOCKET_DATALEN);
           if (u->packets_out[p] == NOBLOCK)
             {
-#if UIP_ATTEMPTS_ON_WRITE > 0
-              if ((--attempts)>0)
+#if UIP_WRITE_TIMEOUT > 0
+              if (millis() - timeout_start > UIP_WRITE_TIMEOUT)
+                {
+                  setWriteError();
+                  goto ready;
+                }
 #endif
-#if UIP_ATTEMPTS_ON_WRITE != 0
-                goto repeat;
-#endif
-              goto ready;
+              goto repeat;
             }
           u->out_pos = 0;
         }
@@ -211,13 +207,14 @@ newpacket:
         {
           if (p == UIP_SOCKET_NUMPACKETS-1)
             {
-#if UIP_ATTEMPTS_ON_WRITE > 0
-              if ((--attempts)>0)
+#if UIP_WRITE_TIMEOUT > 0
+              if (millis() - timeout_start > UIP_WRITE_TIMEOUT)
+                {
+                  setWriteError();
+                  goto ready;
+                }
 #endif
-#if UIP_ATTEMPTS_ON_WRITE != 0
-                goto repeat;
-#endif
-              goto ready;
+              goto repeat;
             }
           p++;
           goto newpacket;
@@ -253,22 +250,15 @@ UIPClient::available()
   if (!(*this))
     return 0;
 
-  int len = _available(data);
+  int len = 0;
+  for (uint8_t i = 0; i < UIP_SOCKET_NUMPACKETS; i++)
+    {
+      len += Enc28J60Network::blockSize(data->packets_in[i]);
+    }
 
   // if sketch checks for incoming data and there are unsent data, flush the transmit buffer
   if (!len)
     flush();
-  return len;
-}
-
-int
-UIPClient::_available(uip_userdata_t *u)
-{
-  int len = 0;
-  for (uint8_t i = 0; i < UIP_SOCKET_NUMPACKETS; i++)
-    {
-      len += Enc28J60Network::blockSize(u->packets_in[i]);
-    }
   return len;
 }
 
