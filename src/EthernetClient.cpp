@@ -115,6 +115,7 @@ UIPClient::stop()
         }
       else
         {
+          flush();
           data->state |= UIP_CLIENT_CLOSE;
         }
 #ifdef UIPETHERNET_DEBUG_CLIENT
@@ -205,6 +206,8 @@ newpacket:
       u->out_pos+=written;
       if (remain > 0)
         {
+          if (p == 0) // block 0 just filled, start sending immediately
+            flush();
           if (p == UIP_SOCKET_NUMPACKETS-1)
             {
 #if UIP_WRITE_TIMEOUT > 0
@@ -240,8 +243,21 @@ UIPClient::availableForWrite()
 void
 UIPClient::flush()
 {
+  UIPEthernetClass::tick();
+
   if (data && data->packets_out[0] != NOBLOCK)
-    data->state |= UIP_CLIENT_FLUSH;
+    {
+      struct uip_conn* conn = &uip_conns[data->conn_index];
+      if (!uip_outstanding(conn))
+        {
+          uip_poll_conn(conn);
+          if (uip_len > 0)
+            {
+              uip_arp_out();
+              UIPEthernetClass::network_send();
+            }
+        }
+    }
 }
 
 int
@@ -439,8 +455,6 @@ finish_newdata:
           Serial.println(F("UIPClient uip_acked"));
 #endif
           UIPClient::_eatBlock(u->packets_out);
-          if (u->packets_out[0] == NOBLOCK)
-            u->state &= ~UIP_CLIENT_FLUSH;
           goto send;
         }
       if (uip_poll() || uip_rexmit())
@@ -453,14 +467,12 @@ send:
             {
               if (u->packets_out[1] == NOBLOCK)
                 {
-                 if ((u->state & UIP_CLIENT_FLUSH) || (u->state & UIP_CLIENT_CLOSE)) {
                   send_len = u->out_pos;
                   if (send_len > 0)
                     {
                       Enc28J60Network::resizeBlock(u->packets_out[0],0,send_len);
                     }
                  }
-                }
               else
                 send_len = Enc28J60Network::blockSize(u->packets_out[0]);
               if (send_len > 0)

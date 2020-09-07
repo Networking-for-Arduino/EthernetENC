@@ -5,7 +5,8 @@ The modernization includes:
 * Ethernet 2.0 library functions
 * support of many Arduino architectures by using the SPI library
 * SPI transactions to share the SPI bus with devices with different communication settings
-* heavy buffering of sent TCP data in ENC with flush() function to send the last buffer
+* SPI communication at 20 MHz if the MCU supports it, else on the maximum supported by the MCU
+* client.flush() to send the packet immediately
 
 [The documentation of Arduino Ethernet library](https://www.arduino.cc/en/Reference/Ethernet) applies for class and functions descriptions.
 
