@@ -184,8 +184,7 @@ UIPEthernetClass::tick()
 #ifdef UIPETHERNET_DEBUG
       if (in_packet != NOBLOCK)
         {
-          Serial.print(F("--------------\nreceivePacket: "));
-          Serial.println(in_packet);
+          Serial.println(F("--------------\npacket received"));
         }
 #endif
     }
@@ -201,7 +200,9 @@ UIPEthernetClass::tick()
               uip_packet = in_packet; //required for upper_layer_checksum of in_packet!
 #ifdef UIPETHERNET_DEBUG
               Serial.print(F("readPacket type IP, uip_len: "));
-              Serial.println(uip_len);
+              Serial.print(uip_len);
+              Serial.print(F(", bits: "));
+              Serial.println(BUF->flags, BIN);
 #endif
               uip_arp_ipin();
               uip_input();
@@ -227,8 +228,7 @@ UIPEthernetClass::tick()
       if (in_packet != NOBLOCK && (packetstate & UIPETHERNET_FREEPACKET))
         {
 #ifdef UIPETHERNET_DEBUG
-          Serial.print(F("freeing packet: "));
-          Serial.println(in_packet);
+          Serial.println(F("freeing received packet"));
 #endif
           Enc28J60Network::freePacket();
           in_packet = NOBLOCK;
@@ -243,17 +243,16 @@ UIPEthernetClass::tick()
 
       for (int i = 0; i < UIP_CONNS; i++)
         {
-      uip_conn = &uip_conns[i];
-          uip_process(UIP_TIMER);
-        // If the above function invocation resulted in data that
-        // should be sent out on the Enc28J60Network, the global variable
-        // uip_len is set to a value > 0.
-      if (uip_len > 0)
-        {
-          uip_arp_out();
-          network_send();
+           uip_periodic(i);
+          // If the above function invocation resulted in data that
+          // should be sent out on the Enc28J60Network, the global variable
+          // uip_len is set to a value > 0.
+          if (uip_len > 0)
+            {
+              uip_arp_out();
+              network_send();
+            }
         }
-    }
 #if UIP_UDP
       for (int i = 0; i < UIP_UDP_CONNS; i++)
         {
@@ -291,7 +290,9 @@ boolean UIPEthernetClass::network_send()
       Serial.print(F("Enc28J60Network_send uip_buf (uip_len): "));
       Serial.print(uip_len);
       Serial.print(F(", packet: "));
-      Serial.println(uip_packet);
+      Serial.print(uip_packet);
+      Serial.print(F(", bits: "));
+      Serial.println(BUF->flags, BIN);
 #endif
       Enc28J60Network::writePacket(uip_packet, UIP_SENDBUFFER_OFFSET,uip_buf,uip_len);
       goto sendandfree;
