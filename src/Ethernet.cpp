@@ -330,6 +330,20 @@ void UIPEthernetClass::configure(IPAddress ip, IPAddress dns, IPAddress gateway,
   _dnsServerAddress = dns;
 }
 
+void
+UIPEthernetClass::call_yield()
+{
+  static bool in_yield;
+  static uint32_t last_call_millis;
+  if (!in_yield && millis() - last_call_millis > 0)
+    {
+      last_call_millis = millis();
+      in_yield = true;
+      yield();
+      in_yield = false;
+    }
+}
+
 /*---------------------------------------------------------------------------*/
 uint16_t
 UIPEthernetClass::chksum(uint16_t sum, const uint8_t *data, uint16_t len)

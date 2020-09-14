@@ -8,6 +8,7 @@ The modernization includes:
 * SPI transactions to share the SPI bus with devices with different communication settings
 * SPI communication at 20 MHz if the MCU supports it, else on the maximum supported by the MCU
 * client.flush() to send the packet immediately
+* calls yield() in blocking functions 
 
 [The documentation of Arduino Ethernet library](https://www.arduino.cc/en/Reference/Ethernet) applies for classes and functions descriptions.
 

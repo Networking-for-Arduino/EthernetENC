@@ -117,6 +117,8 @@ private:
 
   static boolean network_send();
 
+  static void call_yield();
+
   friend class EthernetServer;
 
   friend class EthernetClient;

@@ -184,6 +184,7 @@ newpacket:
                   goto ready;
                 }
 #endif
+              Ethernet.call_yield();
               goto repeat;
             }
           u->out_pos = 0;
@@ -217,6 +218,7 @@ newpacket:
                   goto ready;
                 }
 #endif
+              Ethernet.call_yield();
               goto repeat;
             }
           p++;
