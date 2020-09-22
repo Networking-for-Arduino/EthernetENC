@@ -1,25 +1,25 @@
 
-EthernetENC is the Ethernet library for ENC28J60. It is a modern version of the UIPEthernet library.
+EthernetENC is the Ethernet library for ENC28J60. It is a modern version of [the UIPEthernet library](https://github.com/jandrassy/EthernetENC/wiki/UIPEthernet).
 
 The modernization includes:
-* Ethernet 2.0 library functions
+* Ethernet 2.0.0 Arduino library functions
 * compatible include file names EthernetClient.h, EthernetServer.h and EthernetUdp.h 
 * support of many Arduino architectures by using the SPI library
 * SPI transactions to share the SPI bus with devices with different communication settings
 * SPI communication at 20 MHz if the MCU supports it, else on the maximum supported by the MCU
 * client.flush() to send the packet immediately
 * calls yield() in blocking functions 
+* Arduino 1.5 library format built with dot_a_linkage option  for optimal build result
 
 [The documentation of Arduino Ethernet library](https://www.arduino.cc/en/Reference/Ethernet) applies for classes and functions descriptions.
 
 Limitations:
 * UDP.beginMulticast is not supported, because the uIP stack doesn't support multicast
 * UDB broadcasts receiving is turned off on ENC to lower the processing load on the library
-* EthernetServer doesn't support the print-to-all-clients functionality, because it takes flash memory space and RAM (10 bytes) and nobody uses it
 
 This library doesn't have examples, because examples of the Arduino Ethernet library apply. You can find them in the Arduino IDE Examples menu Ethernet section. Only change `#include <Ethernet.h>` to `#include <EthernetENC.h>`. Some examples require [a little change](https://github.com/jandrassy/EthernetENC/wiki/Examples). 
 
-This library is based on the Norbert Truchsess's arduino-uip original source code repository and uses experience from the development of the multiarchitecture support by Cassy. Applicable fixes and enhancements from developed of EthernetENC were transfered to Cassy's UIPEthernet.
+This library is based on the Norbert Truchsess's arduino-uip original source code repository and uses experience from the development of the multi-architecture support by Cassy. Applicable fixes and enhancements from developed of EthernetENC were transfered to Cassy's UIPEthernet.
 
 **You can find more information in project's [Wiki](https://github.com/jandrassy/EthernetENC/wiki).**
 

@@ -30,10 +30,25 @@ public:
   void begin();
   void end();
   operator bool();
-  
+
+protected:
+  size_t writeToAllClients(const uint8_t *buf, size_t size);
+
 private:
   uint16_t _port;
   bool listening = false;
+};
+
+class EthernetServerPrint : public EthernetServer, public Print {
+
+public:
+  EthernetServerPrint(uint16_t port) : EthernetServer(port) {}
+
+  virtual size_t write(uint8_t);
+  virtual size_t write(const uint8_t *buf, size_t size);
+
+  using Print::write;
+
 };
 
 #endif
