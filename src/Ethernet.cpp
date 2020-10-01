@@ -132,14 +132,14 @@ int UIPEthernetClass::maintain(){
 
 EthernetLinkStatus UIPEthernetClass::linkStatus()
 {
-  if (!(initialized && Enc28J60Network::getrev()))
+  if (!Enc28J60Network::getrev())
     return Unknown;
   return Enc28J60Network::linkStatus() ? LinkON : LinkOFF;
 }
 
 EthernetHardwareStatus UIPEthernetClass::hardwareStatus()
 {
-  if (!(initialized && Enc28J60Network::getrev()))
+  if (!Enc28J60Network::getrev())
     return EthernetNoHardware;
   return EthernetENC28J60;
 }

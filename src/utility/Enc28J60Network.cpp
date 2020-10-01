@@ -38,22 +38,30 @@ extern "C" {
 
 #define SPI_ETHERNET_SETTINGS SPISettings(20000000, MSBFIRST, SPI_MODE0)
 //
+bool Enc28J60Network::spiInitialized=false;
 uint8_t Enc28J60Network::csPin=SS;
 uint16_t Enc28J60Network::nextPacketPtr;
 uint8_t Enc28J60Network::bank=0xff;
 
 struct memblock Enc28J60Network::receivePkt;
 
+void Enc28J60Network::initSPI()
+{
+  if (spiInitialized)
+    return;
+  pinMode(csPin, OUTPUT);
+  CSPASSIVE;
+  SPI.begin();
+  spiInitialized = true;
+}
+
 bool Enc28J60Network::init(uint8_t* macaddr)
 {
 
   MemoryPool::init(); // 1 byte in between RX_STOP_INIT and pool to allow prepending of controlbyte
-  // initialize I/O
-  // ss as output:
-  pinMode(csPin, OUTPUT);
-  CSPASSIVE; // ss=0
-  //
-  SPI.begin();
+
+  initSPI();
+
   SPI.beginTransaction(SPI_ETHERNET_SETTINGS);
 
   // perform system reset
@@ -234,7 +242,7 @@ Enc28J60Network::sendPacket(memhandle handle)
   writeRegPair(ETXSTL, start);
   // Set the TXND pointer to correspond to the packet size given
   writeRegPair(ETXNDL, end);
- 
+
   bool success = false;
   // See Rev. B7 Silicon Errata issues 12 and 13
   for (uint8_t retry = 0; retry < TX_COLLISION_RETRY_COUNT; retry++)
@@ -272,7 +280,7 @@ Enc28J60Network::setReadPtr(memhandle handle, memaddress position, uint16_t len)
   memaddress start = handle == UIP_RECEIVEBUFFERHANDLE && packet->begin + position > RXSTOP_INIT ? packet->begin + position-((RXSTOP_INIT + 1)-RXSTART_INIT) : packet->begin + position;
 
   writeRegPair(ERDPTL, start);
-  
+
   if (len > packet->size - position)
     len = packet->size - position;
   return len;
@@ -544,6 +552,7 @@ Enc28J60Network::clkout(uint8_t clk)
 uint8_t
 Enc28J60Network::getrev(void)
 {
+  initSPI();
   SPI.beginTransaction(SPI_ETHERNET_SETTINGS);
   uint8_t res = readReg(EREVID);
   if (res == 0xFF) {
