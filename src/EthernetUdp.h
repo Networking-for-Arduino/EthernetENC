@@ -32,11 +32,19 @@ extern "C" {
 #define UIP_UDP_MAXPACKETSIZE UIP_UDP_MAXDATALEN+UIP_UDP_PHYH_LEN
 
 typedef struct {
+  memhandle packet = NOBLOCK;
+  uip_ipaddr_t remote_ip;
+  uint16_t remote_port = 0;
+} uip_udp_msg_rec_t;
+
+typedef struct {
   memaddress out_pos;
-  memhandle packet_next;
-  memhandle packet_in;
-  memhandle packet_out;
+  uip_udp_msg_rec_t packet_next[UIP_UDP_BACKLOG];
+  memhandle packet_in = NOBLOCK;
+  memhandle packet_out = NOBLOCK;
   boolean send;
+  uip_ipaddr_t remote_ip;
+  uint16_t remote_port = 0;
 } uip_udp_userdata_t;
 
 class EthernetUDP : public UDP
@@ -123,6 +131,9 @@ private:
   friend class UIPEthernetClass;
   static void _send(uip_udp_userdata_t *data);
 
+  static uint8_t _newBlock(uip_udp_msg_rec_t* blocks);
+  static void _moveBlocks(uip_udp_msg_rec_t* blocks);
+  static void _flushBlocks(uip_udp_msg_rec_t* blocks);
 };
 
 #endif

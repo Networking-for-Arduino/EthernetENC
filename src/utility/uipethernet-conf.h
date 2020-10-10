@@ -1,6 +1,8 @@
 #ifndef UIPETHERNET_CONF_H
 #define UIPETHERNET_CONF_H
 
+// https://github.com/jandrassy/EthernetENC/wiki/Settings
+
 /* for TCP */
 #ifndef UIP_SOCKET_NUMPACKETS
 #define UIP_SOCKET_NUMPACKETS    3
@@ -15,7 +17,14 @@
 #define UIP_CONF_UDP             1
 #endif
 #ifndef UIP_CONF_UDP_CONNS
-#define UIP_CONF_UDP_CONNS       4
+#define UIP_CONF_UDP_CONNS       2
+#endif
+
+/**
+ * size of received UDP messages backlog. it must be at least 1
+ */
+#ifndef UIP_UDP_BACKLOG
+#define UIP_UDP_BACKLOG       2
 #endif
 
 /* timeout in ms for attempts to get a free memory block to write

@@ -15,7 +15,7 @@ The modernization includes:
 
 Limitations:
 * UDP.beginMulticast is not supported, because the uIP stack doesn't support multicast
-* UDB broadcasts receiving is turned off on ENC to lower the processing load on the library
+* UDP broadcasts receiving is turned off on ENC to lower the processing load on the library
 
 This library doesn't have examples, because examples of the Arduino Ethernet library apply. You can find them in the Arduino IDE Examples menu Ethernet section. Only change `#include <Ethernet.h>` to `#include <EthernetENC.h>`. Some examples require [a little change](https://github.com/jandrassy/EthernetENC/wiki/Examples). 
 

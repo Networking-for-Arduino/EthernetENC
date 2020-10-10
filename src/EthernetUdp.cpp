@@ -67,7 +67,7 @@ UIPUDP::stop()
       _uip_udp_conn->appstate = NULL;
       _uip_udp_conn=NULL;
       Enc28J60Network::freeBlock(appdata.packet_in);
-      Enc28J60Network::freeBlock(appdata.packet_next);
+      _flushBlocks(appdata.packet_next);
       Enc28J60Network::freeBlock(appdata.packet_out);
       memset(&appdata,0,sizeof(appdata));
     }
@@ -212,8 +212,10 @@ UIPUDP::parsePacket()
 #endif
   Enc28J60Network::freeBlock(appdata.packet_in);
 
-  appdata.packet_in = appdata.packet_next;
-  appdata.packet_next = NOBLOCK;
+  appdata.packet_in = appdata.packet_next[0].packet;
+  uip_ipaddr_copy(appdata.remote_ip, appdata.packet_next[0].remote_ip);
+  appdata.remote_port = appdata.packet_next[0].remote_port;
+  _moveBlocks(appdata.packet_next);
 
 #ifdef UIPETHERNET_DEBUG_UDP
   if (appdata.packet_in != NOBLOCK)
@@ -301,14 +303,14 @@ UIPUDP::discardReceived()
 IPAddress
 UIPUDP::remoteIP()
 {
-  return _uip_udp_conn ? ip_addr_uip(_uip_udp_conn->ripaddr) : IPAddress();
+  return ip_addr_uip(appdata.remote_ip);
 }
 
 // Return the port of the host who sent the current incoming packet
 uint16_t
 UIPUDP::remotePort()
 {
-  return _uip_udp_conn ? ntohs(_uip_udp_conn->rport) : 0;
+  return ntohs(appdata.remote_port);
 }
 
 // uIP callback function
@@ -319,21 +321,22 @@ uipudp_appcall(void) {
     {
       if (uip_newdata())
         {
-          if (data->packet_next == NOBLOCK)
+          uint8_t p = UIPUDP::_newBlock(data->packet_next);
+          if (data->packet_next[p].packet == NOBLOCK)
             {
-              uip_udp_conn->rport = UDPBUF->srcport;
-              uip_ipaddr_copy(uip_udp_conn->ripaddr,UDPBUF->srcipaddr);
-              data->packet_next = Enc28J60Network::allocBlock(ntohs(UDPBUF->udplen)-UIP_UDPH_LEN);
+              data->packet_next[p].remote_port = UDPBUF->srcport;
+              uip_ipaddr_copy( data->packet_next[p].remote_ip,UDPBUF->srcipaddr);
+              data->packet_next[p].packet = Enc28J60Network::allocBlock(ntohs(UDPBUF->udplen)-UIP_UDPH_LEN);
                   //if we are unable to allocate memory the packet is dropped. udp doesn't guarantee packet delivery
-              if (data->packet_next != NOBLOCK)
+              if (data->packet_next[p].packet != NOBLOCK)
                 {
                   //discard Linklevel and IP and udp-header and any trailing bytes:
-                  Enc28J60Network::copyPacket(data->packet_next,0,UIPEthernetClass::in_packet,UIP_UDP_PHYH_LEN,Enc28J60Network::blockSize(data->packet_next));
+                  Enc28J60Network::copyPacket(data->packet_next[p].packet,0,UIPEthernetClass::in_packet,UIP_UDP_PHYH_LEN,Enc28J60Network::blockSize(data->packet_next[p].packet));
     #ifdef UIPETHERNET_DEBUG_UDP
                   Serial.print(F("udp, uip_newdata received packet: "));
-                  Serial.print(data->packet_next);
+                  Serial.print(data->packet_next[p].packet);
                   Serial.print(F(", size: "));
-                  Serial.println(Enc28J60Network::blockSize(data->packet_next));
+                  Serial.println(Enc28J60Network::blockSize(data->packet_next[p].packet));
     #endif
                 }
             }
@@ -377,6 +380,37 @@ UIPUDP::_send(uip_udp_userdata_t *data) {
       Serial.print(F("udp, uip_packet to send: "));
       Serial.println(UIPEthernetClass::uip_packet);
 #endif
+    }
+}
+
+uint8_t
+UIPUDP::_newBlock(uip_udp_msg_rec_t* block)
+{
+  for (uint8_t i = 0; i < UIP_UDP_BACKLOG; i++)
+    {
+      if (block[i].packet == NOBLOCK)
+        return i;
+    }
+  return UIP_UDP_BACKLOG-1;
+}
+
+void
+UIPUDP::_moveBlocks(uip_udp_msg_rec_t* block)
+{
+  for (uint8_t i = 0; i < UIP_UDP_BACKLOG-1; i++)
+    {
+      block[i] = block[i+1];
+    }
+  block[UIP_UDP_BACKLOG-1].packet = NOBLOCK;
+}
+
+void
+UIPUDP::_flushBlocks(uip_udp_msg_rec_t* block)
+{
+  for (uint8_t i = 0; i < UIP_UDP_BACKLOG; i++)
+    {
+      Enc28J60Network::freeBlock(block[i].packet);
+      block[i].packet = NOBLOCK;
     }
 }
 #endif

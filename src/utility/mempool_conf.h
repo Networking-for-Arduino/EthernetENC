@@ -17,7 +17,7 @@ typedef uint8_t memhandle;
 #endif
 
 #if UIP_UDP and UIP_UDP_CONNS
-#define NUM_UDP_MEMBLOCKS 3*UIP_UDP_CONNS
+#define NUM_UDP_MEMBLOCKS ((2+UIP_UDP_BACKLOG)*UIP_UDP_CONNS)
 #else
 #define NUM_UDP_MEMBLOCKS 0
 #endif
