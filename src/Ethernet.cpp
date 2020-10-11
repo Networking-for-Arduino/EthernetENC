@@ -262,7 +262,7 @@ UIPEthernetClass::tick()
           // uip_len is set to a value > 0. */
           if (uip_len > 0)
             {
-              EthernetUDP::_send((uip_udp_userdata_t *)(uip_udp_conns[i].appstate));
+              EthernetUDP::_send(&uip_udp_conns[i]);
             }
         }
 #endif /* UIP_UDP */

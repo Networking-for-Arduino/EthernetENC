@@ -90,6 +90,9 @@ UIPUDP::beginPacket(IPAddress ip, uint16_t port)
 #endif
       if (_uip_udp_conn)
         {
+          // [J.A]: for UDP server, setting ripaddr and rport causes in uIP filtering
+          // of incoming messages. it would be better to store the IP and port in fields
+          // and set them only in endPacket().
           _uip_udp_conn->rport = htons(port);
           uip_ipaddr_copy(_uip_udp_conn->ripaddr, &ripaddr);
         }
@@ -170,7 +173,7 @@ UIPUDP::endPacket()
       uip_udp_periodic_conn(_uip_udp_conn);
       if (uip_len > 0)
         {
-          _send(&appdata);
+          _send(_uip_udp_conn);
           return 1;
         }
     }
@@ -359,7 +362,8 @@ uipudp_appcall(void) {
 }
 
 void
-UIPUDP::_send(uip_udp_userdata_t *data) {
+UIPUDP::_send(struct uip_udp_conn *uip_udp_conn) {
+
   uip_arp_out(); //add arp
   if (uip_len == UIP_ARPHDRSIZE)
     {
@@ -373,9 +377,17 @@ UIPUDP::_send(uip_udp_userdata_t *data) {
   else
   //arp found ethaddr for ip (otherwise packet is replaced by arp-request)
     {
+      uip_udp_userdata_t* data = (uip_udp_userdata_t *)(uip_udp_conn->appstate);
       UIPEthernetClass::network_send();
       data->send = false;
       data->packet_out = NOBLOCK;
+
+      // [J.A] a listening UDP port in uIP filters received messages
+      // if rport and ripaddr are set. so we better clear them
+      uip_udp_conn->rport = 0;
+      uip_udp_conn->ripaddr[0] = 0;
+      uip_udp_conn->ripaddr[1] = 0;
+
 #ifdef UIPETHERNET_DEBUG_UDP
       Serial.print(F("udp, uip_packet to send: "));
       Serial.println(UIPEthernetClass::uip_packet);

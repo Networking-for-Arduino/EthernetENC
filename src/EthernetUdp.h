@@ -129,7 +129,7 @@ private:
   friend void uipudp_appcall(void);
 
   friend class UIPEthernetClass;
-  static void _send(uip_udp_userdata_t *data);
+  static void _send(struct uip_udp_conn *uip_udp_conn);
 
   static uint8_t _newBlock(uip_udp_msg_rec_t* blocks);
   static void _moveBlocks(uip_udp_msg_rec_t* blocks);
