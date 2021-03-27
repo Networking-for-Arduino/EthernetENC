@@ -53,7 +53,7 @@ UIPClient::connect(IPAddress ip, uint16_t port)
   if (conn)
     {
 #if UIP_CONNECT_TIMEOUT > 0
-      int32_t timeout = millis() + 1000 * UIP_CONNECT_TIMEOUT;
+      uint32_t timeout = millis() + 1000 * UIP_CONNECT_TIMEOUT;
 #endif
       while((conn->tcpstateflags & UIP_TS_MASK) != UIP_CLOSED)
         {
@@ -108,7 +108,6 @@ UIPClient::stop()
       Serial.println(F("before stop(), with data"));
       _dumpAllData();
 #endif
-      _flushBlocks(data->packets_in);
       if (data->state & UIP_CLIENT_REMOTECLOSED)
         {
           data->state = 0;
@@ -118,6 +117,7 @@ UIPClient::stop()
           flush();
           data->state |= UIP_CLIENT_CLOSE;
         }
+      _flushBlocks(data->packets_in);
 #ifdef UIPETHERNET_DEBUG_CLIENT
       Serial.println(F("after stop()"));
       _dumpAllData();
@@ -170,7 +170,7 @@ UIPClient::write(const uint8_t *buf, size_t size)
   UIPEthernetClass::tick();
   if (u && u->state && !(u->state & (UIP_CLIENT_CLOSE | UIP_CLIENT_REMOTECLOSED)))
     {
-      uint8_t p = _currentBlock(u->packets_out);
+      uint8_t p = _currentBlock(u->packets_out, u->out_pos);
       if (u->packets_out[p] == NOBLOCK)
         {
 newpacket:
@@ -208,7 +208,10 @@ newpacket:
       if (remain > 0)
         {
           if (p == 0) // block 0 just filled, start sending immediately
+          {
             flush();
+            goto repeat;
+          }
           if (p == UIP_SOCKET_NUMPACKETS-1)
             {
 #if UIP_WRITE_TIMEOUT > 0
@@ -237,7 +240,7 @@ UIPClient::availableForWrite()
   UIPEthernetClass::tick();
   if (data->packets_out[0] == NOBLOCK)
     return MAX_AVAILABLE;
-  uint8_t p = _currentBlock(data->packets_out);
+  uint8_t p = _currentBlock(data->packets_out, data->out_pos);
   int used = UIP_SOCKET_DATALEN * p + data->out_pos;
   return MAX_AVAILABLE - used;
 }
@@ -401,7 +404,7 @@ uipclient_appcall(void)
           Serial.print(F("UIPClient uip_newdata, uip_len:"));
           Serial.println(uip_len);
 #endif
-          if (uip_len && !(u->state & (UIP_CLIENT_CLOSE | UIP_CLIENT_REMOTECLOSED)))
+          if (uip_len && u->state && !(u->state & UIP_CLIENT_CLOSE))
             {
               for (uint8_t i=0; i < UIP_SOCKET_NUMPACKETS; i++)
                 {
@@ -539,12 +542,18 @@ UIPClient::_allocateData()
 }
 
 uint8_t
-UIPClient::_currentBlock(memhandle* block)
+UIPClient::_currentBlock(memhandle* block, uint16_t out_pos)
 {
+  if (block[0] == NOBLOCK)
+    return 0;
   for (uint8_t i = 1; i < UIP_SOCKET_NUMPACKETS; i++)
     {
       if (block[i] == NOBLOCK)
+      {
+        if (out_pos == Enc28J60Network::blockSize(block[i-1])) // block is full
+          return i;
         return i-1;
+      }
     }
   return UIP_SOCKET_NUMPACKETS-1;
 }

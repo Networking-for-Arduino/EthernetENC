@@ -87,7 +87,7 @@ private:
   static uip_userdata_t all_data[UIP_CONNS];
   static uip_userdata_t* _allocateData();
 
-  static uint8_t _currentBlock(memhandle* blocks);
+  static uint8_t _currentBlock(memhandle* blocks, uint16_t out_pos);
   static void _eatBlock(memhandle* blocks);
   static void _flushBlocks(memhandle* blocks);
 
