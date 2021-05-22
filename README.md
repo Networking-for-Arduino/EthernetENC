@@ -11,15 +11,22 @@ The modernization includes:
 * calls yield() in blocking functions 
 * Arduino 1.5 library format built with dot_a_linkage option  for optimal build result
 
+<details>
+  <summary>Notes for ESP (click to expand)</summary>
+  
+* *For esp8266 Arduino there is a much better option for enc28j60 than using this library. Use the lwIP_enc28j60 library bundled with esp8266 Arduino boards support package 3. (There is also a lwIP_w5500 and lwIP_w5100 library.)* 
+* *For ESP32 it is better than using a MAC layer module like the enc28j60 to use a PHY layer LAN module like LAN8720 supported by the ESP32 MAC peripheral and the Arduino boards support package.* 
+</details>
+
 [The documentation of Arduino Ethernet library](https://www.arduino.cc/en/Reference/Ethernet) applies for classes and functions descriptions.
 
 Limitations:
 * UDP.beginMulticast is not supported, because the uIP stack doesn't support multicast
 * UDP broadcasts receiving is turned off on ENC to lower the processing load on the library
 
-This library doesn't have examples, because examples of the Arduino Ethernet library apply. You can find them in the Arduino IDE Examples menu Ethernet section. Only change `#include <Ethernet.h>` to `#include <EthernetENC.h>`. Some examples require [a little change](https://github.com/jandrassy/EthernetENC/wiki/Examples). 
+This library doesn't have examples, because examples of the Arduino Ethernet library apply. You can find them in the Arduino IDE Examples menu Ethernet section. Only change `#include <Ethernet.h>` to `#include <EthernetENC.h>`. Some examples require [a little change](https://github.com/jandrassy/EthernetENC/wiki/Examples).
 
-This library is based on the Norbert Truchsess's arduino-uip original source code repository and uses experience from the development of the multi-architecture support by Cassy. Applicable fixes and enhancements from developed of EthernetENC were transfered to Cassy's UIPEthernet.
+This library is based on the Norbert Truchsess's arduino-uip original source code repository and uses experience from the development of the multi-architecture support by Cassy. Applicable fixes and enhancements from development of EthernetENC were transfered to Cassy's UIPEthernet.
 
 **You can find more information in project's [Wiki](https://github.com/jandrassy/EthernetENC/wiki).**
 
