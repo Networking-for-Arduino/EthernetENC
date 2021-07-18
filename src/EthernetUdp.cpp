@@ -81,7 +81,7 @@ int
 UIPUDP::beginPacket(IPAddress ip, uint16_t port)
 {
   UIPEthernetClass::tick();
-  if (ip && port)
+  if ((ip[0] || ip[1] || ip[2] || ip[3]) && port)
     {
       uip_ipaddr_t ripaddr;
       uip_ip_addr(&ripaddr, ip);
