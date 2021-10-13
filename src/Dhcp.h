@@ -141,11 +141,19 @@ private:
   uint32_t _dhcpInitialTransactionId;
   uint32_t _dhcpTransactionId;
   uint8_t  _dhcpMacAddr[6];
+#ifdef __arm__
+  uint8_t  _dhcpLocalIp[4] __attribute__((aligned(4)));
+  uint8_t  _dhcpSubnetMask[4] __attribute__((aligned(4)));
+  uint8_t  _dhcpGatewayIp[4] __attribute__((aligned(4)));
+  uint8_t  _dhcpDhcpServerIp[4] __attribute__((aligned(4)));
+  uint8_t  _dhcpDnsServerIp[4] __attribute__((aligned(4)));
+#else
   uint8_t  _dhcpLocalIp[4];
   uint8_t  _dhcpSubnetMask[4];
   uint8_t  _dhcpGatewayIp[4];
   uint8_t  _dhcpDhcpServerIp[4];
   uint8_t  _dhcpDnsServerIp[4];
+#endif
   uint32_t _dhcpLeaseTime;
   uint32_t _dhcpT1, _dhcpT2;
   signed long _renewInSec;
