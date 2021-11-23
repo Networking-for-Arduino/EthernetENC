@@ -170,7 +170,7 @@ UIPClient::write(const uint8_t *buf, size_t size)
   UIPEthernetClass::tick();
   if (u && u->state && !(u->state & (UIP_CLIENT_CLOSE | UIP_CLIENT_REMOTECLOSED)))
     {
-      uint8_t p = _currentBlock(u->packets_out, u->out_pos);
+      uint8_t p = _currentBlock(u->packets_out);
       if (u->packets_out[p] == NOBLOCK)
         {
 newpacket:
@@ -240,7 +240,7 @@ UIPClient::availableForWrite()
   UIPEthernetClass::tick();
   if (data->packets_out[0] == NOBLOCK)
     return MAX_AVAILABLE;
-  uint8_t p = _currentBlock(data->packets_out, data->out_pos);
+  uint8_t p = _currentBlock(data->packets_out);
   int used = UIP_SOCKET_DATALEN * p + data->out_pos;
   return MAX_AVAILABLE - used;
 }
@@ -542,18 +542,12 @@ UIPClient::_allocateData()
 }
 
 uint8_t
-UIPClient::_currentBlock(memhandle* block, uint16_t out_pos)
+UIPClient::_currentBlock(memhandle* block)
 {
-  if (block[0] == NOBLOCK)
-    return 0;
   for (uint8_t i = 1; i < UIP_SOCKET_NUMPACKETS; i++)
     {
       if (block[i] == NOBLOCK)
-      {
-        if (out_pos == Enc28J60Network::blockSize(block[i-1])) // block is full
-          return i;
         return i-1;
-      }
     }
   return UIP_SOCKET_NUMPACKETS-1;
 }
