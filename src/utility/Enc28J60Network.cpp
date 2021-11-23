@@ -302,12 +302,16 @@ Enc28J60Network::writePacket(memhandle handle, memaddress position, uint8_t* buf
   memblock *packet = &blocks[handle];
   uint16_t start = packet->begin + position;
 
+  if (len > packet->size - position)
+    len = packet->size - position;
+
+  if (len == 0)
+    return 0;
+
   SPI.beginTransaction(SPI_ETHERNET_SETTINGS);
 
   writeRegPair(EWRPTL, start);
 
-  if (len > packet->size - position)
-    len = packet->size - position;
   writeBuffer(len, buffer);
 
   SPI.endTransaction();
