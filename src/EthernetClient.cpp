@@ -598,10 +598,22 @@ void
 UIPClient::_dumpAllData() {
   for (uint8_t i=0; i < UIP_CONNS; i++)
     {
+      if (!all_data[i].state)
+        continue;
       Serial.print(F("UIPClient::all_data["));
       Serial.print(i);
       Serial.print(F("], state:"));
       Serial.println(all_data[i].state, BIN);
+      struct uip_conn& conn = uip_conns[all_data[i].conn_index];
+      Serial.println(ip_addr_uip(conn.ripaddr));
+      Serial.print(F("ix: "));
+      Serial.print(all_data[i].conn_index);
+      Serial.print(F(" tcp flags: 0x"));
+      Serial.print(conn.tcpstateflags, HEX);
+      Serial.print(F(" retransmission: timer "));
+      Serial.print(conn.timer);
+      Serial.print(F(" nrtx "));
+      Serial.println(conn.nrtx);
       Serial.print(F("packets_in: "));
       for (uint8_t j=0; j < UIP_SOCKET_NUMPACKETS; j++)
         {
@@ -626,6 +638,24 @@ UIPClient::_dumpAllData() {
           Serial.print(F("out_pos: "));
           Serial.println(all_data[i].out_pos);
         }
+      Serial.println();
+    }
+  for (uint8_t i=0; i < UIP_CONNS; i++)
+    {
+      struct uip_conn& conn = uip_conns[i];
+      Serial.print(i);
+      Serial.print(' ');
+      Serial.print(ip_addr_uip(conn.ripaddr));
+      Serial.print(':');
+      Serial.print(ntohs(conn.rport));
+      Serial.print(' ');
+      Serial.print(ntohs(conn.lport));
+      Serial.print(F(" tcp flags: 0x"));
+      Serial.print(conn.tcpstateflags, HEX);
+      Serial.print(F(" retransmission: timer "));
+      Serial.print(conn.timer);
+      Serial.print(F(" nrtx "));
+      Serial.println(conn.nrtx);
     }
 }
 #endif
