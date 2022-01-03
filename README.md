@@ -9,6 +9,7 @@ The modernization includes:
 * SPI communication at 20 MHz if the MCU supports it, else on the maximum supported by the MCU
 * client.flush() to send the packet immediately
 * calls yield() in blocking functions 
+* has UDP backlog to receive more than one message at time
 * Arduino 1.5 library format built with dot_a_linkage option  for optimal build result
 
 <details>
