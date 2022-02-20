@@ -268,7 +268,7 @@ UIPClient::flush()
 int
 UIPClient::available()
 {
-  if (!data)
+  if (!(*this))
     return 0;
 
   int len = 0;
@@ -286,7 +286,7 @@ UIPClient::available()
 int
 UIPClient::read(uint8_t *buf, size_t size)
 {
-  if (data)
+  if (*this)
     {
       uint16_t remain = size;
       if (data->packets_in[0] == NOBLOCK)
@@ -338,7 +338,7 @@ UIPClient::read()
 int
 UIPClient::peek()
 {
-  if (data)
+  if (*this)
     {
       if (data->packets_in[0] != NOBLOCK)
         {
@@ -353,7 +353,7 @@ UIPClient::peek()
 void
 UIPClient::discardReceived()
 {
-  if (data)
+  if (*this)
     {
       _flushBlocks(data->packets_in);
     }
