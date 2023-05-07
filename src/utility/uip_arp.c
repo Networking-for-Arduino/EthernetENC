@@ -170,8 +170,7 @@ uip_arp_update(u16_t *ipaddr, struct uip_eth_addr *ethaddr)
 
       /* Check if the source IP address of the incoming packet matches
          the IP address in this ARP table entry. */
-      if(ipaddr[0] == tabptr->ipaddr[0] &&
-	 ipaddr[1] == tabptr->ipaddr[1]) {
+      if(memcmp(ipaddr, tabptr->ipaddr, 4) == 0) {
 	 
 	/* An old entry found, update this and return. */
 	memcpy(tabptr->ethaddr.addr, ethaddr->addr, 6);
