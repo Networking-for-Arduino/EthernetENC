@@ -40,6 +40,7 @@ IPAddress UIPEthernetClass::_dnsServerAddress;
 DhcpClass* UIPEthernetClass::_dhcp(NULL);
 
 unsigned long UIPEthernetClass::periodic_timer;
+unsigned long UIPEthernetClass::arp_timer;
 
 // Because uIP isn't encapsulated within a class we have to use global
 // variables, so we can only have one TCP/IP stack per program.
@@ -178,6 +179,13 @@ UIPEthernetClass::tick()
 {
   if (!initialized)
     return;
+
+  // run ARP table cleanup every 10 seconds as required by a comment in uip_arp.h
+  if (millis() - arp_timer > 10000) {
+    arp_timer = millis();
+    uip_arp_timer();
+  }
+
   if (in_packet == NOBLOCK)
     {
       in_packet = Enc28J60Network::receivePacket();
@@ -488,3 +496,9 @@ uip_udpchksum(void)
 #endif
 
 UIPEthernetClass Ethernet;
+
+extern "C" void serialPrint(int i);
+void serialPrint(int i) {
+  Serial.println(i);
+  Serial.flush();
+}
