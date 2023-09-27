@@ -98,6 +98,8 @@ public:
   IPAddress gatewayIP();
   IPAddress dnsServerIP();
 
+  void setDnsServerIP(const IPAddress dns_server) { _dnsServerAddress = dns_server; }
+
 private:
   static bool initialized;
   static memhandle in_packet;
