@@ -24,10 +24,11 @@
 class EthernetServer {
 
 public:
-  EthernetServer(uint16_t);
+  EthernetServer(uint16_t port = 80);
   EthernetClient available();
   EthernetClient accept();
   void begin();
+  void begin(uint16_t port);
   void end();
   operator bool();
 
@@ -42,7 +43,7 @@ private:
 class EthernetServerPrint : public EthernetServer, public Print {
 
 public:
-  EthernetServerPrint(uint16_t port) : EthernetServer(port) {}
+  EthernetServerPrint(uint16_t port = 80) : EthernetServer(port) {}
 
   virtual size_t write(uint8_t);
   virtual size_t write(const uint8_t *buf, size_t size);

@@ -64,6 +64,12 @@ void UIPServer::begin()
   listening = true;
 }
 
+void UIPServer::begin(uint16_t port)
+{
+  _port = port;
+  begin();
+}
+
 void UIPServer::end() {
   uip_unlisten(_port);
   listening = false;
