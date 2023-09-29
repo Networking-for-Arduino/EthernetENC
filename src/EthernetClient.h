@@ -78,6 +78,8 @@ public:
   IPAddress remoteIP();
   uint16_t remotePort();
 
+  uint8_t status();
+
 private:
   EthernetClient(struct uip_conn *_conn);
   EthernetClient(uip_userdata_t* conn_data);

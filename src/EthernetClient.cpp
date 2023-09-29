@@ -371,6 +371,12 @@ UIPClient::remotePort(void)
   return data ? ntohs(uip_conns[data->conn_index].rport) : 0;
 }
 
+uint8_t
+UIPClient::status()
+{
+  return !data ? UIP_CLOSED :  uip_conns[data->conn_index].tcpstateflags & UIP_TS_MASK;
+}
+
 void
 uipclient_appcall(void)
 {
