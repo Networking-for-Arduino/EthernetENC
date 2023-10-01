@@ -145,6 +145,12 @@ EthernetHardwareStatus UIPEthernetClass::hardwareStatus()
   return EthernetENC28J60;
 }
 
+uint8_t* UIPEthernetClass::macAddress(uint8_t* mac)
+{
+  memcpy(mac, uip_ethaddr.addr, 6);
+  return mac;
+}
+
 IPAddress UIPEthernetClass::localIP()
 {
   IPAddress ret;
@@ -172,6 +178,10 @@ IPAddress UIPEthernetClass::gatewayIP()
 IPAddress UIPEthernetClass::dnsServerIP()
 {
   return _dnsServerAddress;
+}
+
+IPAddress UIPEthernetClass::dnsIP(int n) {
+  return (n == 0) ? _dnsServerAddress : IPAddress();
 }
 
 void

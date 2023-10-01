@@ -93,12 +93,16 @@ public:
   EthernetLinkStatus linkStatus();
   EthernetHardwareStatus hardwareStatus();
 
+  uint8_t* macAddress(uint8_t* mac);
+
   IPAddress localIP();
   IPAddress subnetMask();
   IPAddress gatewayIP();
   IPAddress dnsServerIP();
+  IPAddress dnsIP(int n = 0);
 
   void setDnsServerIP(const IPAddress dns_server) { _dnsServerAddress = dns_server; }
+  void setDNS(IPAddress dns_server)  { _dnsServerAddress = dns_server; }
 
 private:
   static bool initialized;
