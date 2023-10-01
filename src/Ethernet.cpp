@@ -56,11 +56,21 @@ void UIPEthernetClass::init(uint8_t csPin)
 }
 
 #if UIP_UDP
+void
+UIPEthernetClass::setHostname(const char* hostname)
+{
+  if (_dhcp == NULL) {
+    _dhcp = new DhcpClass();
+  }
+  _dhcp->setHostname(hostname);
+}
+
 int
 UIPEthernetClass::begin(const uint8_t* mac, unsigned long timeout, unsigned long responseTimeout)
 {
-  static DhcpClass s_dhcp;
-  _dhcp = &s_dhcp;
+  if (_dhcp == NULL) {
+    _dhcp = new DhcpClass();
+  }
 
   // Initialise the basic info
   init(mac);

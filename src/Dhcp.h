@@ -141,6 +141,7 @@ private:
   uint32_t _dhcpInitialTransactionId;
   uint32_t _dhcpTransactionId;
   uint8_t  _dhcpMacAddr[6];
+  const char* _hostname = nullptr;
 #ifdef __arm__
   uint8_t  _dhcpLocalIp[4] __attribute__((aligned(4)));
   uint8_t  _dhcpSubnetMask[4] __attribute__((aligned(4)));
@@ -181,6 +182,8 @@ public:
   
   int beginWithDHCP(uint8_t *, unsigned long timeout = 60000, unsigned long responseTimeout = 4000);
   int checkLease();
+
+  void setHostname(const char* hostname);
 };
 
 #endif
