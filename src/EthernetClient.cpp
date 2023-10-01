@@ -25,7 +25,6 @@ extern "C"
 }
 #include "Ethernet.h"
 #include "EthernetClient.h"
-#include "Dns.h"
 
 #define UIP_TCP_PHYH_LEN UIP_LLH_LEN+UIP_IPTCPH_LEN
 
@@ -87,11 +86,8 @@ UIPClient::connect(const char *host, uint16_t port)
   // Look up the host first
   int ret = 0;
 #if UIP_UDP
-  DNSClient dns;
   IPAddress remote_addr;
-
-  dns.begin(UIPEthernetClass::_dnsServerAddress);
-  ret = dns.getHostByName(host, remote_addr);
+  ret = Ethernet.hostByName(host, remote_addr);
   if (ret == 1) {
     return connect(remote_addr, port);
   }

@@ -104,6 +104,8 @@ public:
   void setDnsServerIP(const IPAddress dns_server) { _dnsServerAddress = dns_server; }
   void setDNS(IPAddress dns_server)  { _dnsServerAddress = dns_server; }
 
+  int hostByName(const char* hostname, IPAddress& result);
+
 private:
   static bool initialized;
   static memhandle in_packet;

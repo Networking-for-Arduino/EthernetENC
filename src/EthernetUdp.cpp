@@ -19,7 +19,6 @@
 
 #include "Ethernet.h"
 #include "EthernetUdp.h"
-#include "Dns.h"
 
 extern "C" {
 #include "utility/uip-conf.h"
@@ -149,11 +148,8 @@ UIPUDP::beginPacket(const char *host, uint16_t port)
 {
   // Look up the host first
   int ret = 0;
-  DNSClient dns;
   IPAddress remote_addr;
-
-  dns.begin(Ethernet.dnsServerIP());
-  ret = dns.getHostByName(host, remote_addr);
+  ret = Ethernet.hostByName(host, remote_addr);
   if (ret == 1) {
     return beginPacket(remote_addr, port);
   } else {

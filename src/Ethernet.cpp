@@ -19,6 +19,7 @@
 
 #include <Arduino.h>
 #include "Ethernet.h"
+#include "Dns.h"
 #include "utility/Enc28J60Network.h"
 
 extern "C"
@@ -182,6 +183,18 @@ IPAddress UIPEthernetClass::dnsServerIP()
 
 IPAddress UIPEthernetClass::dnsIP(int n) {
   return (n == 0) ? _dnsServerAddress : IPAddress();
+}
+
+int UIPEthernetClass::hostByName(const char* hostname, IPAddress& result)
+{
+  // Look up the host first
+  int ret = 0;
+#if UIP_UDP
+  DNSClient dns;
+  dns.begin(_dnsServerAddress);
+  ret = dns.getHostByName(hostname, result);
+#endif
+  return ret;
 }
 
 void
