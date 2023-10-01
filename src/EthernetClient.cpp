@@ -52,7 +52,7 @@ UIPClient::connect(IPAddress ip, uint16_t port)
   if (conn)
     {
 #if UIP_CONNECT_TIMEOUT > 0
-      uint32_t timeout = millis() + 1000 * UIP_CONNECT_TIMEOUT;
+      uint32_t timeout = millis() + connectTimeout;
 #endif
       while((conn->tcpstateflags & UIP_TS_MASK) != UIP_CLOSED)
         {

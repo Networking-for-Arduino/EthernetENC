@@ -80,11 +80,14 @@ public:
 
   uint8_t status();
 
+  void setConnectionTimeout(uint16_t millis) {connectTimeout = millis;}
+
 private:
   EthernetClient(struct uip_conn *_conn);
   EthernetClient(uip_userdata_t* conn_data);
 
   uip_userdata_t* data;
+  uint16_t connectTimeout = 1000 * UIP_CONNECT_TIMEOUT;
 
   static uip_userdata_t all_data[UIP_CONNS];
   static uip_userdata_t* _allocateData();
