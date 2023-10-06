@@ -94,6 +94,7 @@ public:
   EthernetHardwareStatus hardwareStatus();
 
   uint8_t* macAddress(uint8_t* mac);
+  void MACAddress(uint8_t *mac_address) { macAddress(mac_address); }
 
   IPAddress localIP();
   IPAddress subnetMask();
