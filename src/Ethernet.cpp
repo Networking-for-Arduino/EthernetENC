@@ -117,7 +117,29 @@ UIPEthernetClass::begin(const uint8_t* mac, IPAddress ip, IPAddress dns, IPAddre
   configure(ip,dns,gateway,subnet);
 }
 
+void UIPEthernetClass::end()
+{
+  //close all clients
+  for (int i = 0; i < UIP_CONNS; i++)
+  {
+    if (EthernetClient::all_data[i].state) {
+      EthernetClient client(&EthernetClient::all_data[i]);
+      client.stop();
+    }
+  }
+  // handle clients closings
+  uint32_t st = millis();
+  while (millis() - st < 3000)
+  {
+    tick();
+  }
+  initialized = false;
+  configure(INADDR_NONE, INADDR_NONE, INADDR_NONE, INADDR_NONE);
+}
+
 int UIPEthernetClass::maintain(){
+  if (!initialized)
+    return 0;
   tick();
   int rc = DHCP_CHECK_NONE;
 #if UIP_UDP

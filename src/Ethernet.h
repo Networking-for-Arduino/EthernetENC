@@ -85,6 +85,8 @@ public:
   void begin(const uint8_t* mac, IPAddress ip, IPAddress dns, IPAddress gateway);
   void begin(const uint8_t* mac, IPAddress ip, IPAddress dns, IPAddress gateway, IPAddress subnet);
 
+  void end();
+
   // maintain() must be called at regular intervals to process the incoming serial
   // data and issue IP events to the sketch.  It does not return until all IP
   // events have been processed. Renews dhcp-lease if required.
