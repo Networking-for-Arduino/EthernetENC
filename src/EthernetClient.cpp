@@ -534,7 +534,7 @@ UIPClient::_allocateData()
       uip_userdata_t* data = &UIPClient::all_data[sock];
       if (!data->state)
         {
-          memset(data, 0, sizeof(uip_userdata_t));
+          *data = uip_userdata_t();
           data->conn_index = uip_conn - uip_conns; // pointer arithmetics
           data->state = UIP_CLIENT_CONNECTED;
           return data;
