@@ -1,3 +1,12 @@
+First an important note: There are more suitable libraries for ENC28J60 with ESP8266, RP2040, ESP32 and Mbed Arduino platforms: 
+
+* With ESP8266 and RP2040 platform you can use the EthernetCompat.h from the lwIP_enc28j60 bundled library. 
+* With ESP32 platform version 3 you can use the [EthernetESP32](https://github.com/Networking-for-Arduino/EthernetESP32) library which integrates with networking on the ESP32 platform. 
+* With Arduino Mbed Core boards you can use the [ENC28J60-EMAC](https://github.com/Networking-for-Arduino/ENC28J60-EMAC) library with the platforms Ethernet library
+
+---
+
+# EthernetENC
 
 EthernetENC is the Ethernet library for ENC28J60. It is a modern version of [the UIPEthernet library](https://github.com/jandrassy/EthernetENC/wiki/UIPEthernet).
 
@@ -11,13 +20,6 @@ The modernization includes:
 * calls yield() in blocking functions 
 * has UDP backlog to receive more than one message at time
 * Arduino 1.5 library format built with dot_a_linkage option  for optimal build result
-
-<details>
-  <summary>Notes for ESP (click to expand)</summary>
-  
-* *For esp8266 Arduino there is a much better option for enc28j60 than using this library. Use the lwIP_enc28j60 library bundled with esp8266 Arduino boards support package 3. (There is also a lwIP_w5500 and lwIP_w5100 library.)* 
-* *For ESP32 it is better than using a MAC layer module like the enc28j60 to use a PHY layer LAN module like LAN8720 supported by the ESP32 MAC peripheral and the Arduino boards support package.* 
-</details>
 
 [The documentation of Arduino Ethernet library](https://www.arduino.cc/en/Reference/Ethernet) applies for classes and functions descriptions.
 
