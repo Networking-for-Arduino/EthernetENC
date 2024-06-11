@@ -364,6 +364,16 @@ uip_arp_out(void)
   /* First check if destination is a local broadcast. */
   if(uip_ipaddr_cmp(IPBUF->destipaddr, broadcast_ipaddr)) {
     memcpy(IPBUF->ethhdr.dest.addr, broadcast_ethaddr.addr, 6);
+  } else if ((IPBUF->destipaddr[0] & 0xf0) == 0xe0) {  /* Check for IP multicast */
+    /* Constant prefix */
+    IPBUF->ethhdr.dest.addr[0] = 0x01;
+    IPBUF->ethhdr.dest.addr[1] = 0x00;
+    IPBUF->ethhdr.dest.addr[2] = 0x5e;
+
+    /* Copy last 23 bits from part from IP */
+    IPBUF->ethhdr.dest.addr[3] = (IPBUF->destipaddr[0] >> 8) & 0x7f;
+    IPBUF->ethhdr.dest.addr[4] = (IPBUF->destipaddr[1] & 0xff);
+    IPBUF->ethhdr.dest.addr[5] = (IPBUF->destipaddr[1] >> 8) & 0xff;
   } else {
     /* Check if the destination address is on the local network. */
     if(!uip_ipaddr_maskcmp(IPBUF->destipaddr, uip_hostaddr, uip_netmask)) {
