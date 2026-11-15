@@ -157,12 +157,11 @@ private:
 #endif
   uint32_t _dhcpLeaseTime;
   uint32_t _dhcpT1, _dhcpT2;
-  signed long _renewInSec;
-  signed long _rebindInSec;
-  signed long _lastCheck;
+  uint32_t _renewInSec;
+  uint32_t _rebindInSec;
   unsigned long _timeout;
   unsigned long _responseTimeout;
-  unsigned long _secTimeout;
+  unsigned long _lastCheckLeaseMillis;
   uint8_t _dhcp_state;
   EthernetUDP _dhcpUdpSocket;
   
